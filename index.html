@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RostyLucky - Play & Earn</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #0f172a; color: white; font-family: sans-serif; overflow-x: hidden; }
+        .tab-content { display: none; }
+        .active-tab { display: block; }
+        .tap-animation { animation: pulse 0.1s ease-in-out; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(0.95); } 100% { transform: scale(1); } }
+        .wheel { transition: transform 4s cubic-bezier(0.15, 0, 0.15, 1); border: 8px solid #334155; border-radius: 50%; }
+    </style>
+</head>
+<body class="p-4">
+
+    <div class="flex justify-between items-center bg-slate-800 p-4 rounded-2xl mb-6 shadow-lg">
+        <div>
+            <p class="text-xs text-slate-400 uppercase font-bold">Nivel <span id="user-level">1</span></p>
+            <p class="text-xl font-black text-yellow-400" id="user-points">0 PTS</p>
+        </div>
+        <div class="text-right">
+            <p class="text-xs text-slate-400 uppercase font-bold">Balance USDT</p>
+            <p class="text-xl font-black text-green-400">$<span id="user-balance">0.00</span></p>
+        </div>
+    </div>
+
+    <div id="tab-home" class="tab-content active-tab text-center">
+        <h2 class="text-2xl font-bold mb-4">Energía: <span id="user-energy" class="text-cyan-400">0</span></h2>
+        <div id="tap-area" onclick="handleTap()" class="relative mx-auto w-64 h-64 bg-gradient-to-tr from-yellow-500 to-orange-600 rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(245,158,11,0.5)] active:scale-95 transition-transform cursor-pointer select-none">
+            <span class="text-6xl text-white font-bold">R</span>
+        </div>
+        <p class="mt-4 text-slate-400 italic">100 Taps = 1 Energía para la Ruleta</p>
+        <div class="w-full bg-slate-700 h-4 rounded-full mt-4 overflow-hidden">
+            <div id="tap-progress" class="bg-yellow-400 h-full w-0 transition-all"></div>
+        </div>
+    </div>
+
+    <div id="tab-mine" class="tab-content text-center">
+        <h2 class="text-2xl font-bold mb-6 text-cyan-400 uppercase">Minería en la Nube</h2>
+        <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700">
+            <div id="mining-timer" class="text-4xl font-mono mb-4 text-white">00:00:00</div>
+            <button id="btn-mine" onclick="startMining()" class="bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold py-4 px-8 rounded-2xl w-full transition-all">
+                ACTIVAR MINERÍA (VER ANUNCIO)
+            </button>
+        </div>
+    </div>
+
+    <div id="tab-luck" class="tab-content text-center">
+        <h2 class="text-2xl font-bold mb-4">Ruleta RostyLucky</h2>
+        <div class="relative mx-auto w-72 h-72">
+            <div id="wheel" class="wheel w-full h-full bg-[url('https://cdn-icons-png.flaticon.com/512/3566/3566736.png')] bg-cover"></div>
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 -mt-2 text-red-500 text-3xl">▼</div>
+        </div>
+        <button onclick="spinWheel()" class="mt-8 bg-purple-600 py-3 px-10 rounded-full font-bold">GIRAR (1 Energía)</button>
+    </div>
+
+    <nav class="fixed bottom-4 left-4 right-4 bg-slate-800/90 backdrop-blur-md flex justify-around p-3 rounded-2xl border border-white/10">
+        <button onclick="showTab('home')" class="text-xs">🏠<br>Tap</button>
+        <button onclick="showTab('mine')" class="text-xs">⛏️<br>Minar</button>
+        <button onclick="showTab('luck')" class="text-xs">🎡<br>Suerte</button>
+        <button onclick="showTab('refs')" class="text-xs">👥<br>Amigos</button>
+    </nav>
+
+    <script>
+        // --- VARIABLES DE ESTADO ---
+        let points = 0;
+        let energy = 0;
+        let tapsCount = 0;
+        let balance = 0.00;
+
+        // --- LÓGICA TAP TAP ---
+        function handleTap() {
+            tapsCount++;
+            points += 1;
+            
+            if (tapsCount >= 100) {
+                energy++;
+                tapsCount = 0;
+                // Aquí podrías disparar el Social Bar de Adsterra
+                alert("¡+1 Energía obtenida!");
+            }
+            updateUI();
+        }
+
+        // --- LÓGICA MINERÍA ---
+        function startMining() {
+            // Aquí llamarías a tu anuncio Popunder antes de iniciar
+            alert("Viendo anuncio para activar minería...");
+            let cooldown = 3 * 60 * 60; // 3 horas
+            document.getElementById('btn-mine').disabled = true;
+            // Simulación visual del timer
+            const interval = setInterval(() => {
+                cooldown--;
+                let h = Math.floor(cooldown / 3600);
+                let m = Math.floor((cooldown % 3600) / 60);
+                let s = cooldown % 60;
+                document.getElementById('mining-timer').innerText = `${h}:${m}:${s}`;
+                if (cooldown <= 0) clearInterval(interval);
+            }, 1000);
+        }
+
+        // --- NAVEGACIÓN ---
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active-tab'));
+            document.getElementById('tab-' + tabId).classList.add('active-tab');
+        }
+
+        function updateUI() {
+            document.getElementById('user-points').innerText = points + " PTS";
+            document.getElementById('user-energy').innerText = energy;
+            document.getElementById('user-balance').innerText = balance.toFixed(2);
+            document.getElementById('tap-progress').style.width = tapsCount + "%";
+        }
+
+        // Inicializar Telegram WebApp
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+    </script>
+</body>
+</html>
