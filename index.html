@@ -3,123 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RostyLucky - Play & Earn</title>
+    <title>RostyLucky - Spin & Win</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script type='text/javascript' src='//pl29089431.profitablecpmratenetwork.com/e3/e1/11/e3e11159181e7b873ee93e0a171a4d95.js'></script>
     <style>
         body { background: #0f172a; color: white; font-family: 'Inter', sans-serif; overflow: hidden; user-select: none; -webkit-tap-highlight-color: transparent; }
         .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
-        .tab-content { display: none; height: 75vh; overflow-y: auto; padding-bottom: 100px; }
+        .tab-content { display: none; height: 75vh; overflow-y: auto; padding-bottom: 120px; }
         .active-tab { display: block; }
-        #tap-area { transition: transform 0.05s; touch-action: manipulation; }
         #tap-area:active { transform: scale(0.92); }
         .anim-float { position: absolute; font-weight: 800; color: #facc15; pointer-events: none; animation: floatUp 0.6s ease-out forwards; z-index: 50; }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px); } }
+        /* Animación Ruleta */
+        .spinning { animation: rotate 2s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="p-4">
 
-    <div class="glass p-4 rounded-2xl mb-4 flex justify-between items-center">
+    <div class="glass p-4 rounded-2xl mb-4 flex justify-between items-center shadow-2xl">
         <div>
-            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Nivel <span id="user-level">1</span></p>
-            <p class="text-xl font-black text-yellow-400" id="display-points">0 PTS</p>
+            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Puntos</p>
+            <p class="text-xl font-black text-yellow-400" id="display-pts">0</p>
         </div>
         <div class="text-right">
-            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter italic">Balance Hoy: $<span id="daily-earned">0.00</span>/0.02</p>
+            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest italic">Balance</p>
             <p class="text-xl font-black text-green-400">$<span id="user-balance">0.0000</span></p>
         </div>
     </div>
 
     <main>
-        <div id="tab-home" class="tab-content active-tab text-center pt-8">
-            <h2 class="text-lg font-bold mb-4">Energía: <span id="user-energy" class="text-cyan-400">0</span></h2>
-            
-            <button onclick="banAction()" style="opacity: 0.0001; position: absolute;">RECLAMAR 100 USDT</button>
-
-            <div id="tap-area" ontouchstart="handleTap(event)" class="relative mx-auto w-64 h-64 bg-gradient-to-tr from-yellow-600 to-orange-400 rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(202,138,4,0.3)] border-8 border-white/10">
-                <span class="text-8xl font-black italic text-white/20">R</span>
+        <div id="tab-home" class="tab-content active-tab text-center pt-6">
+            <div class="mb-6">
+                <span class="bg-cyan-900/50 text-cyan-400 px-4 py-1 rounded-full text-xs font-bold border border-cyan-500/30">
+                    ⚡ Energía: <span id="user-energy">0</span>
+                </span>
             </div>
-            <p class="mt-8 text-slate-400 text-sm italic">100 Taps = 1 Energía para Suerte</p>
+            <div id="tap-area" ontouchstart="handleTap(event)" class="relative mx-auto w-60 h-60 bg-gradient-to-tr from-yellow-600 to-orange-400 rounded-full flex items-center justify-center shadow-[0_0_60px_rgba(234,179,8,0.2)] border-[12px] border-white/5 active:scale-90 transition-transform">
+                <span class="text-8xl font-black italic text-white/20 select-none">R</span>
+            </div>
+            <p class="mt-8 text-slate-500 text-xs uppercase tracking-widest">100 Taps = 1 Energía</p>
         </div>
 
-        <div id="tab-mine" class="tab-content text-center pt-10">
-            <div class="glass p-8 rounded-3xl">
-                <h2 class="text-2xl font-bold text-cyan-400 mb-2 tracking-widest uppercase text-[15px]">Minería en la Nube</h2>
-                <p id="mining-timer" class="text-5xl font-mono mb-8">03:00:00</p>
-                <button onclick="triggerMining()" class="w-full bg-cyan-600 py-4 rounded-2xl font-black shadow-lg active:scale-95 transition-all">ACTIVAR MINERÍA (VER ANUNCIO)</button>
+        <div id="tab-wheel" class="tab-content text-center pt-6">
+            <div class="glass p-6 rounded-3xl mb-4">
+                <h2 class="text-xl font-bold mb-4 italic text-yellow-400">Lucky Spin</h2>
+                <div id="wheel-graphic" class="w-48 h-48 mx-auto bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 rounded-full border-8 border-slate-800 flex items-center justify-center shadow-2xl relative">
+                    <div class="w-1 h-10 bg-white absolute top-0 rounded-full shadow-lg"></div>
+                    <span class="text-4xl">🎁</span>
+                </div>
+                <p class="mt-4 text-sm text-slate-300 italic">Costo: 1 Energía</p>
+                <button onclick="spinWheel()" class="mt-6 w-full bg-yellow-500 text-slate-900 py-4 rounded-2xl font-black text-lg shadow-xl active:scale-95 transition-all uppercase">GIRAR AHORA</button>
+            </div>
+            <p class="text-[10px] text-slate-500">Los premios se suman directo a tu balance diario ($0.02 límite).</p>
+        </div>
+
+        <div id="tab-mine" class="tab-content text-center pt-6">
+            <div class="glass p-8 rounded-3xl border-t-4 border-cyan-500">
+                <h2 class="text-xs font-black text-cyan-400 mb-2 uppercase tracking-widest italic">Minería Activa</h2>
+                <p id="mining-timer" class="text-5xl font-mono mb-8 tracking-tighter">03:00:00</p>
+                <button onclick="triggerAds('mining')" class="w-full bg-slate-800 py-4 rounded-2xl font-black border border-white/10 shadow-lg active:bg-slate-700">INICIAR SESIÓN (ADS)</button>
             </div>
         </div>
 
         <div id="tab-refs" class="tab-content">
-            <div class="glass p-6 rounded-3xl text-center mb-4">
-                <h2 class="text-xl font-bold text-yellow-500 mb-1">Sistema de Referidos</h2>
-                <p class="text-xs text-slate-400">Gana el 10% de por vida por cada amigo.</p>
+            <div class="glass p-6 rounded-3xl mb-4 text-center">
+                <p class="text-xs text-slate-400 mb-1 font-bold uppercase">Gana el 10%</p>
+                <input type="text" id="ref-link" readonly class="w-full bg-transparent text-cyan-400 text-[10px] mb-4 text-center outline-none border-b border-white/10 pb-2" value="Cargando link...">
+                <button onclick="copyRef()" class="w-full bg-cyan-600 py-3 rounded-xl font-black text-sm mb-4">COPIAR MI LINK</button>
+                <a href="https://www.profitablecpmratenetwork.com/hjxx0ympqj?key=3816a45c1ebae2a773ddb3dfcdaa95d5" target="_blank" class="block w-full bg-white/5 border border-white/10 py-3 rounded-xl text-xs font-bold">🎁 OBTENER ENERGÍA EXTRA</a>
             </div>
-            <div class="glass p-4 rounded-2xl mb-4">
-                <input type="text" id="ref-link" readonly class="w-full bg-transparent text-cyan-400 text-xs mb-3 text-center outline-none" value="https://t.me/RostyLuckyBot?start=user">
-                <button onclick="copyRef()" class="w-full bg-white text-black py-2 rounded-xl font-bold text-sm">COPIAR LINK</button>
-            </div>
-            <a href="https://www.profitablecpmratenetwork.com/hjxx0ympqj?key=3816a45c1ebae2a773ddb3dfcdaa95d5" target="_blank" class="block w-full bg-gradient-to-r from-blue-600 to-cyan-500 p-4 rounded-2xl text-center font-bold text-sm">🎁 OBTENER ENERGÍA EXTRA GRATIS</a>
-        </div>
-
-        <div id="tab-withdraw" class="tab-content">
-            <h2 class="text-xl font-bold mb-6 text-center">Métodos de Retiro</h2>
-            <div class="space-y-4">
-                <div class="glass p-4 rounded-2xl flex justify-between items-center border-l-4 border-green-500">
-                    <div><p class="font-bold">Pago Móvil (Venezuela)</p><p class="text-[10px] text-slate-400 italic">Tasa BCV</p></div>
-                    <span class="text-yellow-400 font-black">Min. 680 Bs</span>
-                </div>
-                <div class="glass p-4 rounded-2xl flex justify-between items-center border-l-4 border-cyan-500">
-                    <div><p class="font-bold">Airtm / PayPal</p><p class="text-[10px] text-slate-400 italic">USDT Directo</p></div>
-                    <span class="text-yellow-400 font-black">Min. $5.00</span>
-                </div>
-            </div>
-            <p class="text-[10px] text-slate-500 mt-10 text-center uppercase tracking-widest font-bold">Procesado por RostyLucky Team</p>
         </div>
     </main>
 
     <nav class="fixed bottom-6 left-4 right-4 glass flex justify-around p-4 rounded-3xl shadow-2xl z-50">
         <button onclick="showTab('home')" class="text-2xl">🏠</button>
+        <button onclick="showTab('wheel')" class="text-2xl">🎡</button>
         <button onclick="showTab('mine')" class="text-2xl">⛏️</button>
         <button onclick="showTab('refs')" class="text-2xl">👥</button>
-        <button onclick="showTab('withdraw')" class="text-2xl">💰</button>
     </nav>
 
     <script>
         let pts = 0; let energy = 0; let balance = 0.00; let daily = 0.00; let taps = 0;
-        let lastTap = 0; let fastTapCount = 0;
+        let lastTap = 0; let fastTaps = 0;
 
         function handleTap(e) {
             const now = Date.now();
-            if (now - lastTap < 100) { // Mas de 10 clics por segundo
-                fastTapCount++;
-                if (fastTapCount > 10) { alert("¡Seguridad Anti-Bot: Calma los dedos!"); return; }
-            } else { fastTapCount = 0; }
+            if (now - lastTap < 100) { fastTaps++; if (fastTaps > 12) return; } else { fastTaps = 0; }
             lastTap = now;
 
             const touch = e.touches[0];
-            const float = document.createElement("div");
-            float.innerText = "+1"; float.className = "anim-float";
-            float.style.left = touch.clientX + "px"; float.style.top = touch.clientY + "px";
-            document.body.appendChild(float); setTimeout(() => float.remove(), 600);
-
+            createFloat(touch.clientX, touch.clientY);
             pts++; taps++;
-            if (taps >= 100) { energy++; taps = 0; updateDaily(0.0001); }
+            if (taps >= 100) { energy++; taps = 0; }
             updateUI();
         }
 
-        function updateDaily(amt) {
-            if (daily < 0.02) { balance += amt; daily += amt; }
-        }
-
-        function triggerMining() {
-            // Activa el Popunder al intentar minar
+        function spinWheel() {
+            if (energy < 1) { alert("¡Necesitas 1 de Energía! Haz más Tap Tap."); return; }
+            
+            // Seguridad: Activar anuncio Popunder al girar
             window.open('https://www.profitablecpmratenetwork.com/hjxx0ympqj?key=3816a45c1ebae2a773ddb3dfcdaa95d5', '_blank');
-            alert("Minería Activada. No cierres la App.");
+            
+            energy--;
+            const wheel = document.getElementById('wheel-graphic');
+            wheel.classList.add('spinning');
+
+            setTimeout(() => {
+                wheel.classList.remove('spinning');
+                const win = (Math.random() * 0.002).toFixed(4); // Gana entre 0 y 0.002
+                if (daily < 0.02) {
+                    balance += parseFloat(win);
+                    daily += parseFloat(win);
+                    alert("¡Felicidades! Ganaste $" + win);
+                } else {
+                    alert("Has alcanzado el límite diario de ganancias.");
+                }
+                updateUI();
+            }, 2000);
         }
 
-        function banAction() { alert("Bot Detectado. Cuenta Suspendida."); window.close(); }
+        function triggerAds(type) {
+            window.open('https://www.profitablecpmratenetwork.com/hjxx0ympqj?key=3816a45c1ebae2a773ddb3dfcdaa95d5', '_blank');
+            if(type === 'mining') alert("Minería iniciada con éxito.");
+        }
+
+        function createFloat(x, y) {
+            const el = document.createElement("div");
+            el.innerText = "+1"; el.className = "anim-float";
+            el.style.left = x + "px"; el.style.top = y + "px";
+            document.body.appendChild(el); setTimeout(() => el.remove(), 600);
+        }
 
         function showTab(id) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active-tab'));
@@ -127,21 +142,24 @@
         }
 
         function updateUI() {
-            document.getElementById('display-points').innerText = pts + " PTS";
+            document.getElementById('display-pts').innerText = pts;
             document.getElementById('user-balance').innerText = balance.toFixed(4);
-            document.getElementById('daily-earned').innerText = daily.toFixed(2);
             document.getElementById('user-energy').innerText = energy;
         }
 
         function copyRef() {
             const el = document.getElementById('ref-link');
             el.select(); document.execCommand('copy');
-            alert("¡Link copiado! Gana el 10% por cada referido.");
+            alert("Link copiado al portapapeles.");
         }
 
+        // Init Telegram y Link
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.setHeaderColor('#0f172a');
+        window.onload = () => {
+            const user = tg.initDataUnsafe.user;
+            if (user) document.getElementById('ref-link').value = "https://t.me/RostyLuckyBot?start=" + user.id;
+        };
     </script>
 
     <script src="https://pl29089430.profitablecpmratenetwork.com/dc/73/a2/dc73a2370cdcfb545e7a197bc8bb269a.js"></script>
