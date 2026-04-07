@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RostyLucky - Play & Earn</title>
+    <title>RostyLucky - Elite Mining</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -12,11 +12,22 @@
         .tab-content { display: none; height: 75vh; overflow-y: auto; padding-bottom: 120px; }
         .active-tab { display: block; }
         
-        /* Ruleta Sincronizada */
+        /* Burbujas Cian Neón */
+        .bubble {
+            position: absolute; pointer-events: none; font-weight: 900; color: #22d3ee;
+            animation: bubbleUp 0.8s ease-out forwards; z-index: 100; font-size: 26px;
+            text-shadow: 0 0 15px rgba(34, 211, 238, 0.9);
+        }
+        @keyframes bubbleUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-150px) translateX(var(--x)) scale(1.5); }
+        }
+
+        /* Ruleta con Ejes Fijos */
         #wheel-container { position: relative; width: 280px; height: 280px; margin: 0 auto; }
         #wheel-main { 
             width: 100%; height: 100%; border-radius: 50%; border: 6px solid #1e293b;
-            position: relative; overflow: hidden; transition: transform 7s cubic-bezier(0.15, 0, 0.15, 1);
+            position: relative; overflow: hidden; transition: transform 7.5s cubic-bezier(0.15, 0, 0.15, 1);
             background: conic-gradient(
                 #facc15 0deg 45deg, #eab308 45deg 90deg, 
                 #facc15 90deg 135deg, #eab308 135deg 180deg,
@@ -24,40 +35,24 @@
                 #facc15 270deg 315deg, #eab308 315deg 360deg
             );
         }
-        .wheel-marker {
-            position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
-            width: 34px; height: 44px; background: #ef4444; clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
-            z-index: 30; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6));
-        }
         .wheel-segment {
             position: absolute; width: 50%; height: 50%; transform-origin: 100% 100%;
             display: flex; align-items: center; justify-content: center;
         }
-        .wheel-segment span {
-            position: absolute; font-size: 22px;
-            transform: skewY(45deg) rotate(22.5deg) translateY(-85px); 
-        }
+        .wheel-segment span { position: absolute; font-size: 22px; transform: skewY(45deg) rotate(22.5deg) translateY(-85px); }
+        .wheel-marker { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); width: 34px; height: 44px; background: #ef4444; clip-path: polygon(0% 0%, 100% 0%, 50% 100%); z-index: 30; }
 
-        /* Burbujas Animadas */
-        .bubble {
-            position: absolute; pointer-events: none; font-weight: 900; color: #facc15;
-            animation: bubbleUp 0.8s ease-out forwards; z-index: 100; font-size: 24px;
-            text-shadow: 0 0 10px rgba(234, 179, 8, 0.8);
-        }
-        @keyframes bubbleUp {
-            0% { opacity: 1; transform: translateY(0) scale(1); }
-            100% { opacity: 0; transform: translateY(-150px) translateX(var(--x)) scale(1.5); }
-        }
+        /* Contenedor de Anuncio debajo de la moneda */
+        #ad-container { min-height: 80px; width: 100%; margin-top: 20px; display: flex; justify-content: center; }
 
-        /* Barra de Nivel */
-        .lvl-bar { height: 6px; background: #1e293b; border-radius: 10px; overflow: hidden; }
+        .lvl-bar { height: 6px; background: #1e293b; border-radius: 10px; overflow: hidden; margin-top: 8px; }
         .lvl-progress { height: 100%; background: linear-gradient(90deg, #22d3ee, #facc15); width: 0%; transition: width 0.5s; }
     </style>
 </head>
 <body class="p-4">
 
     <div class="glass p-4 rounded-2xl mb-4 shadow-2xl border-b-2 border-yellow-500/20">
-        <div class="flex justify-between items-center mb-2">
+        <div class="flex justify-between items-center">
             <div>
                 <p class="text-[9px] text-slate-400 font-black uppercase tracking-widest" id="lvl-name">Nivel: Novato</p>
                 <p class="text-xl font-black text-yellow-400" id="display-pts">0</p>
@@ -71,8 +66,8 @@
     </div>
 
     <main>
-        <div id="tab-home" class="tab-content active-tab text-center pt-4">
-            <div class="mb-6">
+        <div id="tab-home" class="tab-content active-tab text-center pt-2">
+            <div class="mb-4">
                 <span class="bg-cyan-950 text-cyan-400 px-5 py-2 rounded-full text-[10px] font-black border border-cyan-500/30">
                     ⚡ ENERGÍA: <span id="user-energy">0</span>
                 </span>
@@ -80,16 +75,21 @@
             <div id="tap-area" ontouchstart="handleTap(event)" class="relative mx-auto w-60 h-60 bg-gradient-to-tr from-yellow-600 to-orange-400 rounded-full flex items-center justify-center shadow-[0_0_60px_rgba(234,179,8,0.4)] border-[12px] border-white/10 active:scale-95 transition-transform">
                 <span class="text-9xl font-black italic text-white/20 select-none">R</span>
             </div>
-            <p class="mt-10 text-slate-500 text-[10px] font-bold uppercase tracking-[0.4em]">Tap para minar energía</p>
+            
+            <div id="ad-container">
+                <script src="https://pl29089430.profitablecpmratenetwork.com/dc/73/a2/dc73a2370cdcfb545e7a197bc8bb269a.js"></script>
+            </div>
+            
+            <p class="text-slate-500 text-[10px] font-bold uppercase tracking-[0.4em] mt-4">Tap para minar energía</p>
         </div>
 
         <div id="tab-wheel" class="tab-content text-center pt-4 px-2">
             <button onclick="claimDaily()" class="mb-6 w-full glass border-yellow-500/40 p-4 rounded-2xl flex items-center justify-between active:scale-95 transition-all">
-                <div class="flex items-center gap-3"><span>🎁</span><div class="text-left"><p class="text-[10px] font-black text-yellow-400 uppercase">Bono Diario</p><p id="daily-timer" class="text-[9px] text-slate-400 font-bold italic">¡Listo para ti!</p></div></div>
+                <div class="flex items-center gap-3"><span>🎁</span><div class="text-left"><p class="text-[10px] font-black text-yellow-400 uppercase">Regalo Diario</p><p id="daily-timer" class="text-[9px] text-slate-400">¡Disponible!</p></div></div>
                 <span class="bg-yellow-500 text-slate-900 text-[10px] px-3 py-1 rounded-lg font-black italic">+5 ⚡</span>
             </button>
 
-            <div class="glass p-6 rounded-[45px] relative shadow-2xl overflow-hidden">
+            <div class="glass p-6 rounded-[45px] relative shadow-2xl">
                 <div class="wheel-marker"></div>
                 <div id="wheel-container">
                     <div id="wheel-main">
@@ -103,24 +103,24 @@
                         <div class="wheel-segment" style="transform: rotate(315deg) skewY(-45deg);"><span>❌</span></div>
                     </div>
                 </div>
-                <button id="btn-spin" onclick="spinWheel()" class="mt-8 w-full bg-yellow-500 text-slate-900 py-4 rounded-2xl font-black text-lg shadow-[0_5px_0_#854d0e] active:shadow-none active:translate-y-1 transition-all uppercase italic">¡PROBAR SUERTE! (1 ⚡)</button>
+                <button id="btn-spin" onclick="spinWheel()" class="mt-8 w-full bg-yellow-500 text-slate-900 py-4 rounded-2xl font-black text-lg shadow-[0_5px_0_#854d0e] active:shadow-none active:translate-y-1 transition-all uppercase">¡PROBAR SUERTE! (1 ⚡)</button>
             </div>
         </div>
 
         <div id="tab-mine" class="tab-content text-center pt-6 px-2">
             <div class="glass p-8 rounded-3xl border-t-4 border-cyan-500 shadow-2xl">
-                <p class="text-[10px] text-slate-400 uppercase font-black mb-2">Pasivos esta sesión</p>
+                <p class="text-[10px] text-slate-400 uppercase font-black mb-2">Ingresos Pasivos</p>
                 <p class="text-3xl font-black text-cyan-400 mb-6">+<span id="session-pts">0</span> pts</p>
                 <p id="mining-timer" class="text-5xl font-mono mb-8 tracking-tighter">03:00:00</p>
-                <button id="btn-mine" onclick="startMining()" class="w-full bg-slate-800 py-4 rounded-2xl font-black border border-white/10 shadow-lg active:bg-slate-700">ACTIVAR CLOUD MINING</button>
+                <button id="btn-mine" onclick="startMining()" class="w-full bg-slate-800 py-4 rounded-2xl font-black border border-white/10 shadow-lg">ACTIVAR MINERÍA</button>
             </div>
         </div>
 
-        <div id="tab-refs" class="tab-content px-2 pt-6">
-            <div class="glass p-6 rounded-3xl text-center border-b-4 border-cyan-600 shadow-2xl">
-                <p class="text-[11px] text-slate-400 font-bold uppercase mb-4">Tu Red de Referidos</p>
-                <input type="text" id="ref-link" readonly class="w-full bg-slate-900/60 p-4 rounded-xl text-cyan-400 text-[10px] mb-6 text-center border border-white/5 outline-none font-mono">
-                <button onclick="copyRef()" class="w-full bg-cyan-600 py-4 rounded-2xl font-black text-sm shadow-xl active:scale-95">COPIAR LINK</button>
+        <div id="tab-refs" class="tab-content px-2 pt-6 text-center">
+            <div class="glass p-6 rounded-3xl border-b-4 border-cyan-600 shadow-2xl">
+                <p class="text-[11px] text-slate-400 font-bold uppercase mb-4">Gana 10% de tus amigos</p>
+                <input type="text" id="ref-link" readonly class="w-full bg-slate-900/60 p-4 rounded-xl text-cyan-400 text-[10px] mb-6 text-center border border-white/5 font-mono">
+                <button onclick="copyRef()" class="w-full bg-cyan-600 py-4 rounded-2xl font-black text-sm">COPIAR ENLACE</button>
             </div>
         </div>
     </main>
@@ -133,7 +133,7 @@
     </nav>
 
     <script>
-        let pts = 0; let energy = 0; let balance = 0.00; let daily = 0;
+        let pts = 0; let energy = 0; let balance = 0.00; 
         let taps = 0; let isMining = false; let sessionPts = 0;
         let miningSeconds = 10800;
 
@@ -141,28 +141,24 @@
             window.open('https://www.profitablecpmratenetwork.com/hjxx0ympqj?key=3816a45c1ebae2a773ddb3dfcdaa95d5', '_blank');
         }
 
-        // --- SISTEMA DE BURBUJAS ---
+        // Tap con burbujas cian
         function handleTap(e) {
             pts++; taps++;
             if (taps >= 100) { energy++; taps = 0; }
-            
-            const touch = e.touches[0];
-            createBubble(touch.clientX, touch.clientY);
+            createBubble(e.touches[0].clientX, e.touches[0].clientY);
             updateUI();
         }
 
         function createBubble(x, y) {
             const b = document.createElement("div");
-            b.innerText = "+1";
-            b.className = "bubble";
-            b.style.left = x + "px";
-            b.style.top = y + "px";
-            b.style.setProperty('--x', (Math.random() * 100 - 50) + "px"); // Movimiento lateral aleatorio
+            b.innerText = "+1"; b.className = "bubble";
+            b.style.left = x + "px"; b.style.top = y + "px";
+            b.style.setProperty('--x', (Math.random() * 100 - 50) + "px");
             document.body.appendChild(b);
             setTimeout(() => b.remove(), 800);
         }
 
-        // --- RULETA SINCRONIZADA ---
+        // Ruleta con sincronización fija
         function spinWheel() {
             if (energy < 1) { alert("¡Sin energía!"); return; }
             triggerPopunder();
@@ -172,70 +168,51 @@
             const btn = document.getElementById('btn-spin');
             btn.disabled = true; btn.style.opacity = "0.5";
 
-            // Calculamos una rotación que siempre termine centrada en un segmento (múltiplo de 45)
-            const extraDeg = Math.floor(Math.random() * 8) * 45; 
-            const totalRotation = 3600 + extraDeg; 
+            // Lógica: Elegimos el segmento (0 al 7) antes de girar
+            const targetSegment = Math.floor(Math.random() * 8); 
+            const segmentDeg = 45;
+            // Calculamos el ángulo final para que el segmento quede bajo la flecha (flecha está en 0deg)
+            // IMPORTANTE: Para que el segmento X quede en el tope, la ruleta debe rotar (360 - (X * 45))
+            const finalRotation = 3600 + (360 - (targetSegment * segmentDeg)); 
             
-            wheel.style.transform = `rotate(${totalRotation}deg)`;
+            wheel.style.transform = `rotate(${finalRotation}deg)`;
 
             setTimeout(() => {
-                const finalPosition = extraDeg; // 0, 45, 90, 135, 180, 225, 270, 315
-                // En nuestro conic-gradient y segmentos, los premios están en: 0, 90, 180, 270
-                // La flecha está arriba (0deg). Si rotamos la ruleta X grados, el segmento que queda arriba es (360 - X)
-                const winningSegments = [0, 90, 180, 270];
-                const actualTop = (360 - (finalPosition % 360)) % 360;
-
-                if (winningSegments.includes(actualTop)) {
-                    const winAmt = (Math.random() * 0.0015).toFixed(4);
+                // Índices pares (0, 2, 4, 6) son los iconos de premio
+                const winningIndices = [0, 2, 4, 6];
+                if (winningIndices.includes(targetSegment)) {
+                    const winAmt = (Math.random() * 0.0018 + 0.0001).toFixed(5);
                     balance += parseFloat(winAmt);
-                    alert(`💎 ¡PREMIO! Has ganado $${winAmt} USDT.`);
+                    alert(`💎 ¡SÍ! Has ganado $${winAmt} USDT.`);
                 } else {
-                    alert("🎰 Uffs, casi... ¡Sigue intentando!");
+                    alert("🎰 No hubo suerte esta vez. ¡Sigue intentando!");
                 }
-
                 btn.disabled = false; btn.style.opacity = "1";
                 updateUI();
-            }, 7000);
+            }, 7600);
         }
 
-        // --- SISTEMA DE NIVELES ---
         function updateLevels() {
             const lvlFill = document.getElementById('lvl-fill');
             const lvlName = document.getElementById('lvl-name');
             let progress = 0;
-            
             if (pts < 1000) { lvlName.innerText = "Nivel: Novato"; progress = (pts / 1000) * 100; }
             else if (pts < 5000) { lvlName.innerText = "Nivel: Bronce"; progress = ((pts - 1000) / 4000) * 100; }
-            else if (pts < 20000) { lvlName.innerText = "Nivel: Plata"; progress = ((pts - 5000) / 15000) * 100; }
-            else if (pts < 100000) { lvlName.innerText = "Nivel: Oro"; progress = ((pts - 20000) / 80000) * 100; }
-            else { lvlName.innerText = "Nivel: Diamante"; progress = 100; }
-            
+            else { lvlName.innerText = "Nivel: Plata"; progress = 100; }
             lvlFill.style.width = progress + "%";
         }
 
-        // --- LOGICA GENERAL ---
         function startMining() {
             if(isMining) return;
-            triggerPopunder();
-            isMining = true;
-            document.getElementById('btn-mine').innerText = "MINERÍA ACTIVA...";
-            const timerInterval = setInterval(() => {
+            triggerPopunder(); isMining = true;
+            document.getElementById('btn-mine').innerText = "MINANDO...";
+            setInterval(() => {
                 miningSeconds--;
-                let h = Math.floor(miningSeconds / 3600).toString().padStart(2, '0');
-                let m = Math.floor((miningSeconds % 3600) / 60).toString().padStart(2, '0');
-                let s = (miningSeconds % 60).toString().padStart(2, '0');
-                document.getElementById('mining-timer').innerText = `${h}:${m}:${s}`;
                 if (miningSeconds % 10 === 0) { pts += 2; sessionPts += 2; updateUI(); }
-                if (miningSeconds <= 0) { clearInterval(timerInterval); isMining = false; }
             }, 1000);
         }
 
-        function claimDaily() {
-            triggerPopunder();
-            energy += 5; updateUI();
-            alert("🎁 ¡+5 Energías añadidas!");
-        }
-
+        function claimDaily() { triggerPopunder(); energy += 5; updateUI(); alert("¡+5 Energías!"); }
         function showTab(id) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active-tab'));
             document.getElementById('tab-' + id).classList.add('active-tab');
@@ -252,7 +229,7 @@
         function copyRef() {
             const el = document.getElementById('ref-link');
             el.select(); document.execCommand('copy');
-            alert("¡Copiado!");
+            alert("¡Link copiado!");
         }
 
         const tg = window.Telegram.WebApp;
@@ -263,6 +240,5 @@
             updateUI();
         };
     </script>
-    <script src="https://pl29089430.profitablecpmratenetwork.com/dc/73/a2/dc73a2370cdcfb545e7a197bc8bb269a.js"></script>
 </body>
 </html>
