@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RostyLucky - Play & Earn Global</title>
+    <title>RostyLucky - Play & Earn</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -12,7 +12,7 @@
         .tab-content { display: none; height: 75vh; overflow-y: auto; padding-bottom: 120px; }
         .active-tab { display: block; }
         
-        /* RULETA PREMIUM OPTIMIZADA */
+        /* Ruleta Sincronizada */
         #wheel-container { position: relative; width: 280px; height: 280px; margin: 0 auto; }
         #wheel-main { 
             width: 100%; height: 100%; border-radius: 50%; border: 6px solid #1e293b;
@@ -23,83 +23,76 @@
                 #facc15 180deg 225deg, #eab308 225deg 270deg,
                 #facc15 270deg 315deg, #eab308 315deg 360deg
             );
-            box-shadow: 0 0 40px rgba(0,0,0,0.5), inset 0 0 30px rgba(0,0,0,0.3);
         }
         .wheel-marker {
             position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
             width: 34px; height: 44px; background: #ef4444; clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
-            z-index: 20; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6));
+            z-index: 30; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6));
         }
-        /* Ajuste de posición de iconos para que no se amontonen en el centro */
         .wheel-segment {
             position: absolute; width: 50%; height: 50%; transform-origin: 100% 100%;
             display: flex; align-items: center; justify-content: center;
         }
         .wheel-segment span {
-            position: absolute;
-            font-size: 22px;
-            /* El truco: alejamos el icono del centro del eje */
+            position: absolute; font-size: 22px;
             transform: skewY(45deg) rotate(22.5deg) translateY(-85px); 
-            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
-        }
-        #wheel-center {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 50px; height: 50px; background: #1e293b; border-radius: 50%;
-            border: 3px solid #facc15; z-index: 10; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 15px rgba(0,0,0,0.8); font-size: 20px;
         }
 
-        /* Animaciones */
-        #tap-area:active { transform: scale(0.94); }
-        .anim-float { position: absolute; font-weight: 800; color: #facc15; pointer-events: none; animation: floatUp 0.6s ease-out forwards; z-index: 50; }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px); } }
-        .mining-active { color: #22d3ee; animation: pulse 1.5s infinite; text-shadow: 0 0 15px rgba(34, 211, 238, 0.6); }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+        /* Burbujas Animadas */
+        .bubble {
+            position: absolute; pointer-events: none; font-weight: 900; color: #facc15;
+            animation: bubbleUp 0.8s ease-out forwards; z-index: 100; font-size: 24px;
+            text-shadow: 0 0 10px rgba(234, 179, 8, 0.8);
+        }
+        @keyframes bubbleUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-150px) translateX(var(--x)) scale(1.5); }
+        }
+
+        /* Barra de Nivel */
+        .lvl-bar { height: 6px; background: #1e293b; border-radius: 10px; overflow: hidden; }
+        .lvl-progress { height: 100%; background: linear-gradient(90deg, #22d3ee, #facc15); width: 0%; transition: width 0.5s; }
     </style>
 </head>
 <body class="p-4">
 
-    <div class="glass p-4 rounded-2xl mb-4 flex justify-between items-center border-b-2 border-yellow-500/20 shadow-2xl">
-        <div>
-            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Puntos Totales</p>
-            <p class="text-xl font-black text-yellow-400" id="display-pts">0</p>
+    <div class="glass p-4 rounded-2xl mb-4 shadow-2xl border-b-2 border-yellow-500/20">
+        <div class="flex justify-between items-center mb-2">
+            <div>
+                <p class="text-[9px] text-slate-400 font-black uppercase tracking-widest" id="lvl-name">Nivel: Novato</p>
+                <p class="text-xl font-black text-yellow-400" id="display-pts">0</p>
+            </div>
+            <div class="text-right">
+                <p class="text-[9px] text-slate-400 font-black uppercase italic">Balance USDT</p>
+                <p class="text-xl font-black text-green-400">$<span id="user-balance">0.0000</span></p>
+            </div>
         </div>
-        <div class="text-right">
-            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest italic">Balance USDT</p>
-            <p class="text-xl font-black text-green-400">$<span id="user-balance">0.0000</span></p>
-        </div>
+        <div class="lvl-bar"><div id="lvl-fill" class="lvl-progress"></div></div>
     </div>
 
     <main>
-        <div id="tab-home" class="tab-content active-tab text-center pt-6">
-            <div class="mb-8">
-                <span class="bg-cyan-950/50 text-cyan-400 px-5 py-2 rounded-full text-xs font-black border border-cyan-500/30 shadow-lg">
+        <div id="tab-home" class="tab-content active-tab text-center pt-4">
+            <div class="mb-6">
+                <span class="bg-cyan-950 text-cyan-400 px-5 py-2 rounded-full text-[10px] font-black border border-cyan-500/30">
                     ⚡ ENERGÍA: <span id="user-energy">0</span>
                 </span>
             </div>
-            <div id="tap-area" ontouchstart="handleTap(event)" class="relative mx-auto w-56 h-56 bg-gradient-to-tr from-yellow-600 to-orange-400 rounded-full flex items-center justify-center shadow-[0_0_60px_rgba(234,179,8,0.3)] border-[10px] border-white/10 active:scale-90 transition-transform">
-                <span class="text-8xl font-black italic text-white/20 select-none">R</span>
+            <div id="tap-area" ontouchstart="handleTap(event)" class="relative mx-auto w-60 h-60 bg-gradient-to-tr from-yellow-600 to-orange-400 rounded-full flex items-center justify-center shadow-[0_0_60px_rgba(234,179,8,0.4)] border-[12px] border-white/10 active:scale-95 transition-transform">
+                <span class="text-9xl font-black italic text-white/20 select-none">R</span>
             </div>
-            <p class="mt-10 text-slate-500 text-[9px] font-bold uppercase tracking-[0.3em]">Pulsa para generar energía</p>
+            <p class="mt-10 text-slate-500 text-[10px] font-bold uppercase tracking-[0.4em]">Tap para minar energía</p>
         </div>
 
         <div id="tab-wheel" class="tab-content text-center pt-4 px-2">
-            <button id="btn-daily" onclick="claimDaily()" class="mb-6 w-full glass border-yellow-500/40 p-4 rounded-2xl flex items-center justify-between active:scale-95 transition-all">
-                <div class="flex items-center gap-3">
-                    <span class="text-2xl">🎁</span>
-                    <div class="text-left">
-                        <p class="text-[10px] font-black text-yellow-400 uppercase tracking-tighter">Bono de Lealtad</p>
-                        <p id="daily-timer" class="text-[9px] text-slate-400 font-bold">¡Disponible para ti!</p>
-                    </div>
-                </div>
-                <span class="bg-yellow-500 text-slate-900 text-[9px] px-3 py-1 rounded-lg font-black italic">+5 ⚡</span>
+            <button onclick="claimDaily()" class="mb-6 w-full glass border-yellow-500/40 p-4 rounded-2xl flex items-center justify-between active:scale-95 transition-all">
+                <div class="flex items-center gap-3"><span>🎁</span><div class="text-left"><p class="text-[10px] font-black text-yellow-400 uppercase">Bono Diario</p><p id="daily-timer" class="text-[9px] text-slate-400 font-bold italic">¡Listo para ti!</p></div></div>
+                <span class="bg-yellow-500 text-slate-900 text-[10px] px-3 py-1 rounded-lg font-black italic">+5 ⚡</span>
             </button>
 
-            <div class="glass p-6 rounded-[45px] mb-4 relative shadow-2xl">
+            <div class="glass p-6 rounded-[45px] relative shadow-2xl overflow-hidden">
                 <div class="wheel-marker"></div>
                 <div id="wheel-container">
                     <div id="wheel-main">
-                        <div id="wheel-center">🎰</div>
                         <div class="wheel-segment" style="transform: rotate(0deg) skewY(-45deg);"><span>💰</span></div>
                         <div class="wheel-segment" style="transform: rotate(45deg) skewY(-45deg);"><span>❌</span></div>
                         <div class="wheel-segment" style="transform: rotate(90deg) skewY(-45deg);"><span>💎</span></div>
@@ -110,27 +103,24 @@
                         <div class="wheel-segment" style="transform: rotate(315deg) skewY(-45deg);"><span>❌</span></div>
                     </div>
                 </div>
-                
                 <button id="btn-spin" onclick="spinWheel()" class="mt-8 w-full bg-yellow-500 text-slate-900 py-4 rounded-2xl font-black text-lg shadow-[0_5px_0_#854d0e] active:shadow-none active:translate-y-1 transition-all uppercase italic">¡PROBAR SUERTE! (1 ⚡)</button>
             </div>
         </div>
 
         <div id="tab-mine" class="tab-content text-center pt-6 px-2">
             <div class="glass p-8 rounded-3xl border-t-4 border-cyan-500 shadow-2xl">
-                <div class="mb-4">
-                    <p class="text-[10px] text-slate-400 uppercase font-black tracking-widest">Ganancia Actual</p>
-                    <p class="text-2xl font-bold text-cyan-400">+<span id="session-pts">0</span> pts</p>
-                </div>
-                <p id="mining-timer" class="text-5xl font-mono mb-8 tracking-tighter text-slate-200">03:00:00</p>
-                <button id="btn-mine" onclick="startMining()" class="w-full bg-slate-800 py-4 rounded-2xl font-black border border-white/10 shadow-lg active:bg-slate-700 transition-colors uppercase">Activar Minería</button>
+                <p class="text-[10px] text-slate-400 uppercase font-black mb-2">Pasivos esta sesión</p>
+                <p class="text-3xl font-black text-cyan-400 mb-6">+<span id="session-pts">0</span> pts</p>
+                <p id="mining-timer" class="text-5xl font-mono mb-8 tracking-tighter">03:00:00</p>
+                <button id="btn-mine" onclick="startMining()" class="w-full bg-slate-800 py-4 rounded-2xl font-black border border-white/10 shadow-lg active:bg-slate-700">ACTIVAR CLOUD MINING</button>
             </div>
         </div>
 
         <div id="tab-refs" class="tab-content px-2 pt-6">
             <div class="glass p-6 rounded-3xl text-center border-b-4 border-cyan-600 shadow-2xl">
-                <p class="text-[11px] text-slate-400 font-bold uppercase mb-4 tracking-widest">Invita y Gana 10%</p>
+                <p class="text-[11px] text-slate-400 font-bold uppercase mb-4">Tu Red de Referidos</p>
                 <input type="text" id="ref-link" readonly class="w-full bg-slate-900/60 p-4 rounded-xl text-cyan-400 text-[10px] mb-6 text-center border border-white/5 outline-none font-mono">
-                <button onclick="copyRef()" class="w-full bg-cyan-600 py-4 rounded-2xl font-black text-sm shadow-xl active:scale-95">COPIAR ENLACE PERSONAL</button>
+                <button onclick="copyRef()" class="w-full bg-cyan-600 py-4 rounded-2xl font-black text-sm shadow-xl active:scale-95">COPIAR LINK</button>
             </div>
         </div>
     </main>
@@ -143,134 +133,107 @@
     </nav>
 
     <script>
-        // Variables Globales
-        let pts = 0; let energy = 0; let balance = 0.00; let daily = 0.00; 
+        let pts = 0; let energy = 0; let balance = 0.00; let daily = 0;
         let taps = 0; let isMining = false; let sessionPts = 0;
-        let miningSeconds = 10800; // 3 Horas
+        let miningSeconds = 10800;
 
         function triggerPopunder() {
             window.open('https://www.profitablecpmratenetwork.com/hjxx0ympqj?key=3816a45c1ebae2a773ddb3dfcdaa95d5', '_blank');
         }
 
+        // --- SISTEMA DE BURBUJAS ---
         function handleTap(e) {
             pts++; taps++;
             if (taps >= 100) { energy++; taps = 0; }
-            createFloat(e.touches[0].clientX, e.touches[0].clientY);
+            
+            const touch = e.touches[0];
+            createBubble(touch.clientX, touch.clientY);
             updateUI();
         }
 
-        // --- SISTEMA DE RULETA PREMIUM (7 Segundos) ---
+        function createBubble(x, y) {
+            const b = document.createElement("div");
+            b.innerText = "+1";
+            b.className = "bubble";
+            b.style.left = x + "px";
+            b.style.top = y + "px";
+            b.style.setProperty('--x', (Math.random() * 100 - 50) + "px"); // Movimiento lateral aleatorio
+            document.body.appendChild(b);
+            setTimeout(() => b.remove(), 800);
+        }
+
+        // --- RULETA SINCRONIZADA ---
         function spinWheel() {
-            if (energy < 1) { alert("¡Sin energía! Toca en el Home para conseguir más."); return; }
-            
-            triggerPopunder(); 
-            energy--;
-            updateUI();
+            if (energy < 1) { alert("¡Sin energía!"); return; }
+            triggerPopunder();
+            energy--; updateUI();
             
             const wheel = document.getElementById('wheel-main');
             const btn = document.getElementById('btn-spin');
+            btn.disabled = true; btn.style.opacity = "0.5";
+
+            // Calculamos una rotación que siempre termine centrada en un segmento (múltiplo de 45)
+            const extraDeg = Math.floor(Math.random() * 8) * 45; 
+            const totalRotation = 3600 + extraDeg; 
             
-            btn.disabled = true;
-            btn.classList.add('opacity-50');
-            
-            // Giro largo para suspenso
-            const randomRotation = 3600 + Math.floor(Math.random() * 360);
-            wheel.style.transform = `rotate(${randomRotation}deg)`;
+            wheel.style.transform = `rotate(${totalRotation}deg)`;
 
             setTimeout(() => {
-                // Estabilizar rotación para el cálculo
-                const finalDeg = randomRotation % 360;
-                
-                // Determinar premio (Flecha arriba es 0deg)
-                // Cada segmento son 45 grados
-                const index = Math.floor(((360 - finalDeg) % 360) / 45);
-                const wins = (index % 2 === 0); // Pares son premios
+                const finalPosition = extraDeg; // 0, 45, 90, 135, 180, 225, 270, 315
+                // En nuestro conic-gradient y segmentos, los premios están en: 0, 90, 180, 270
+                // La flecha está arriba (0deg). Si rotamos la ruleta X grados, el segmento que queda arriba es (360 - X)
+                const winningSegments = [0, 90, 180, 270];
+                const actualTop = (360 - (finalPosition % 360)) % 360;
 
-                if (wins) {
-                    const winAmt = (Math.random() * 0.0020).toFixed(4);
-                    if (daily < 0.03) {
-                        balance += parseFloat(winAmt);
-                        daily += parseFloat(winAmt);
-                        alert(`💎 ¡FANTÁSTICO! Has ganado $${winAmt} USDT.`);
-                    } else {
-                        alert("Has alcanzado el límite diario de retiros. ¡Sigue mañana!");
-                    }
+                if (winningSegments.includes(actualTop)) {
+                    const winAmt = (Math.random() * 0.0015).toFixed(4);
+                    balance += parseFloat(winAmt);
+                    alert(`💎 ¡PREMIO! Has ganado $${winAmt} USDT.`);
                 } else {
-                    alert("🎰 ¡Uffs, casi! Por un pelo... Inténtalo de nuevo.");
+                    alert("🎰 Uffs, casi... ¡Sigue intentando!");
                 }
 
-                btn.disabled = false;
-                btn.classList.remove('opacity-50');
+                btn.disabled = false; btn.style.opacity = "1";
                 updateUI();
-            }, 7000); 
+            }, 7000);
         }
 
-        // --- REGALO DIARIO ---
-        function claimDaily() {
-            const last = localStorage.getItem('lastClaim');
-            const now = Date.now();
-            if (last && (now - last) < 86400000) { alert("Tu regalo se está preparando. Vuelve en unas horas."); return; }
+        // --- SISTEMA DE NIVELES ---
+        function updateLevels() {
+            const lvlFill = document.getElementById('lvl-fill');
+            const lvlName = document.getElementById('lvl-name');
+            let progress = 0;
             
-            triggerPopunder();
-            energy += 5;
-            localStorage.setItem('lastClaim', now);
-            updateDailyTimer();
-            updateUI();
-            alert("🎁 ¡Bono de +5 ⚡ de Energía añadido!");
+            if (pts < 1000) { lvlName.innerText = "Nivel: Novato"; progress = (pts / 1000) * 100; }
+            else if (pts < 5000) { lvlName.innerText = "Nivel: Bronce"; progress = ((pts - 1000) / 4000) * 100; }
+            else if (pts < 20000) { lvlName.innerText = "Nivel: Plata"; progress = ((pts - 5000) / 15000) * 100; }
+            else if (pts < 100000) { lvlName.innerText = "Nivel: Oro"; progress = ((pts - 20000) / 80000) * 100; }
+            else { lvlName.innerText = "Nivel: Diamante"; progress = 100; }
+            
+            lvlFill.style.width = progress + "%";
         }
 
-        function updateDailyTimer() {
-            const last = localStorage.getItem('lastClaim');
-            if (!last) return;
-            const next = parseInt(last) + 86400000;
-            const check = () => {
-                const diff = next - Date.now();
-                if (diff <= 0) { document.getElementById('daily-timer').innerText = "¡Disponible ahora!"; return; }
-                const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
-                const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
-                const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
-                document.getElementById('daily-timer').innerText = `Espera: ${h}:${m}:${s}`;
-                setTimeout(check, 1000);
-            };
-            check();
-        }
-
-        // --- MINERIA ---
+        // --- LOGICA GENERAL ---
         function startMining() {
             if(isMining) return;
             triggerPopunder();
             isMining = true;
-            document.getElementById('btn-mine').innerText = "MINANDO ACTIVAMENTE...";
-            document.getElementById('mining-timer').classList.add('mining-active');
-            
+            document.getElementById('btn-mine').innerText = "MINERÍA ACTIVA...";
             const timerInterval = setInterval(() => {
                 miningSeconds--;
                 let h = Math.floor(miningSeconds / 3600).toString().padStart(2, '0');
                 let m = Math.floor((miningSeconds % 3600) / 60).toString().padStart(2, '0');
                 let s = (miningSeconds % 60).toString().padStart(2, '0');
                 document.getElementById('mining-timer').innerText = `${h}:${m}:${s}`;
-                
-                if (miningSeconds % 10 === 0) { 
-                    pts += 1; sessionPts += 1; 
-                    document.getElementById('session-pts').innerText = sessionPts;
-                    updateUI(); 
-                }
-
-                if (miningSeconds <= 0) {
-                    clearInterval(timerInterval);
-                    isMining = false;
-                    miningSeconds = 10800;
-                    document.getElementById('btn-mine').innerText = "ACTIVAR MINERÍA";
-                    document.getElementById('mining-timer').classList.remove('mining-active');
-                }
+                if (miningSeconds % 10 === 0) { pts += 2; sessionPts += 2; updateUI(); }
+                if (miningSeconds <= 0) { clearInterval(timerInterval); isMining = false; }
             }, 1000);
         }
 
-        function createFloat(x, y) {
-            const el = document.createElement("div");
-            el.innerText = "+1"; el.className = "anim-float";
-            el.style.left = x + "px"; el.style.top = y + "px";
-            document.body.appendChild(el); setTimeout(() => el.remove(), 600);
+        function claimDaily() {
+            triggerPopunder();
+            energy += 5; updateUI();
+            alert("🎁 ¡+5 Energías añadidas!");
         }
 
         function showTab(id) {
@@ -282,29 +245,24 @@
             document.getElementById('display-pts').innerText = pts;
             document.getElementById('user-balance').innerText = balance.toFixed(4);
             document.getElementById('user-energy').innerText = energy;
+            document.getElementById('session-pts').innerText = sessionPts;
+            updateLevels();
         }
 
         function copyRef() {
             const el = document.getElementById('ref-link');
             el.select(); document.execCommand('copy');
-            alert("¡Link copiado al portapapeles!");
+            alert("¡Copiado!");
         }
 
-        // Integración con Telegram WebApp
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.headerColor = '#0f172a';
-
         window.onload = () => {
-            updateDailyTimer();
             const user = tg.initDataUnsafe.user;
-            if (user) {
-                document.getElementById('ref-link').value = "https://t.me/RostyLuckyBot/play?start=" + user.id;
-            }
+            if (user) document.getElementById('ref-link').value = "https://t.me/RostyLuckyBot/play?start=" + user.id;
+            updateUI();
         };
     </script>
-    
     <script src="https://pl29089430.profitablecpmratenetwork.com/dc/73/a2/dc73a2370cdcfb545e7a197bc8bb269a.js"></script>
-
 </body>
 </html>
