@@ -12,10 +12,10 @@
         .tab-content { display: none; height: 75vh; overflow-y: auto; padding-bottom: 120px; }
         .active-tab { display: block; }
         
-        /* Estilos Ruleta Premium */
+        /* RULETA PREMIUM OPTIMIZADA */
         #wheel-container { position: relative; width: 280px; height: 280px; margin: 0 auto; }
         #wheel-main { 
-            width: 100%; height: 100%; border-radius: 50%; border: 8px solid #1e293b;
+            width: 100%; height: 100%; border-radius: 50%; border: 6px solid #1e293b;
             position: relative; overflow: hidden; transition: transform 7s cubic-bezier(0.15, 0, 0.15, 1);
             background: conic-gradient(
                 #facc15 0deg 45deg, #eab308 45deg 90deg, 
@@ -23,26 +23,34 @@
                 #facc15 180deg 225deg, #eab308 225deg 270deg,
                 #facc15 270deg 315deg, #eab308 315deg 360deg
             );
-            box-shadow: 0 0 50px rgba(234, 179, 8, 0.2), inset 0 0 20px rgba(0,0,0,0.5);
+            box-shadow: 0 0 40px rgba(0,0,0,0.5), inset 0 0 30px rgba(0,0,0,0.3);
         }
         .wheel-marker {
-            position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
-            width: 30px; height: 40px; background: #ef4444; clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
-            z-index: 10; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5));
+            position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+            width: 34px; height: 44px; background: #ef4444; clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+            z-index: 20; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6));
         }
+        /* Ajuste de posición de iconos para que no se amontonen en el centro */
         .wheel-segment {
             position: absolute; width: 50%; height: 50%; transform-origin: 100% 100%;
-            display: flex; align-items: center; justify-content: center; font-size: 20px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .wheel-segment span {
+            position: absolute;
+            font-size: 22px;
+            /* El truco: alejamos el icono del centro del eje */
+            transform: skewY(45deg) rotate(22.5deg) translateY(-85px); 
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
         }
         #wheel-center {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 60px; height: 60px; background: #0f172a; border-radius: 50%;
-            border: 4px solid #facc15; z-index: 5; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            width: 50px; height: 50px; background: #1e293b; border-radius: 50%;
+            border: 3px solid #facc15; z-index: 10; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 15px rgba(0,0,0,0.8); font-size: 20px;
         }
 
         /* Animaciones */
-        #tap-area:active { transform: scale(0.92); }
+        #tap-area:active { transform: scale(0.94); }
         .anim-float { position: absolute; font-weight: 800; color: #facc15; pointer-events: none; animation: floatUp 0.6s ease-out forwards; z-index: 50; }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px); } }
         .mining-active { color: #22d3ee; animation: pulse 1.5s infinite; text-shadow: 0 0 15px rgba(34, 211, 238, 0.6); }
@@ -64,80 +72,81 @@
 
     <main>
         <div id="tab-home" class="tab-content active-tab text-center pt-6">
-            <div class="mb-6">
-                <span class="bg-cyan-900/50 text-cyan-400 px-4 py-1 rounded-full text-xs font-bold border border-cyan-500/30">
-                    ⚡ Energía: <span id="user-energy">0</span>
+            <div class="mb-8">
+                <span class="bg-cyan-950/50 text-cyan-400 px-5 py-2 rounded-full text-xs font-black border border-cyan-500/30 shadow-lg">
+                    ⚡ ENERGÍA: <span id="user-energy">0</span>
                 </span>
             </div>
-            <div id="tap-area" ontouchstart="handleTap(event)" class="relative mx-auto w-56 h-56 bg-gradient-to-tr from-yellow-600 to-orange-400 rounded-full flex items-center justify-center shadow-[0_0_60px_rgba(234,179,8,0.3)] border-[12px] border-white/5 active:scale-90 transition-transform">
+            <div id="tap-area" ontouchstart="handleTap(event)" class="relative mx-auto w-56 h-56 bg-gradient-to-tr from-yellow-600 to-orange-400 rounded-full flex items-center justify-center shadow-[0_0_60px_rgba(234,179,8,0.3)] border-[10px] border-white/10 active:scale-90 transition-transform">
                 <span class="text-8xl font-black italic text-white/20 select-none">R</span>
             </div>
-            <p class="mt-8 text-slate-500 text-[10px] uppercase tracking-[0.2em]">100 Taps = 1 Energía</p>
+            <p class="mt-10 text-slate-500 text-[9px] font-bold uppercase tracking-[0.3em]">Pulsa para generar energía</p>
         </div>
 
         <div id="tab-wheel" class="tab-content text-center pt-4 px-2">
-            <button id="btn-daily" onclick="claimDaily()" class="mb-6 w-full glass border-yellow-500/50 p-3 rounded-2xl flex items-center justify-between active:scale-95 transition-all">
+            <button id="btn-daily" onclick="claimDaily()" class="mb-6 w-full glass border-yellow-500/40 p-4 rounded-2xl flex items-center justify-between active:scale-95 transition-all">
                 <div class="flex items-center gap-3">
                     <span class="text-2xl">🎁</span>
                     <div class="text-left">
-                        <p class="text-[10px] font-black text-yellow-400 uppercase">Bono Diario</p>
-                        <p id="daily-timer" class="text-[9px] text-slate-400 font-bold">¡Reclamar ahora!</p>
+                        <p class="text-[10px] font-black text-yellow-400 uppercase tracking-tighter">Bono de Lealtad</p>
+                        <p id="daily-timer" class="text-[9px] text-slate-400 font-bold">¡Disponible para ti!</p>
                     </div>
                 </div>
-                <span class="bg-yellow-500 text-slate-900 text-[9px] px-2 py-1 rounded-lg font-black italic">+5 ENERGÍA</span>
+                <span class="bg-yellow-500 text-slate-900 text-[9px] px-3 py-1 rounded-lg font-black italic">+5 ⚡</span>
             </button>
 
-            <div class="glass p-6 rounded-[40px] mb-4 relative overflow-hidden">
+            <div class="glass p-6 rounded-[45px] mb-4 relative shadow-2xl">
                 <div class="wheel-marker"></div>
                 <div id="wheel-container">
                     <div id="wheel-main">
-                        <div class="wheel-center" id="wheel-center">🎰</div>
-                        <div class="wheel-segment" style="transform: rotate(0deg) skewY(-45deg);"><span style="transform: skewY(45deg) rotate(22deg) translate(40px, -40px);">💰</span></div>
-                        <div class="wheel-segment" style="transform: rotate(45deg) skewY(-45deg);"><span style="transform: skewY(45deg) rotate(22deg) translate(40px, -40px);">❌</span></div>
-                        <div class="wheel-segment" style="transform: rotate(90deg) skewY(-45deg);"><span style="transform: skewY(45deg) rotate(22deg) translate(40px, -40px);">💎</span></div>
-                        <div class="wheel-segment" style="transform: rotate(135deg) skewY(-45deg);"><span style="transform: skewY(45deg) rotate(22deg) translate(40px, -40px);">❌</span></div>
-                        <div class="wheel-segment" style="transform: rotate(180deg) skewY(-45deg);"><span style="transform: skewY(45deg) rotate(22deg) translate(40px, -40px);">💵</span></div>
-                        <div class="wheel-segment" style="transform: rotate(225deg) skewY(-45deg);"><span style="transform: skewY(45deg) rotate(22deg) translate(40px, -40px);">❌</span></div>
-                        <div class="wheel-segment" style="transform: rotate(270deg) skewY(-45deg);"><span style="transform: skewY(45deg) rotate(22deg) translate(40px, -40px);">🪙</span></div>
-                        <div class="wheel-segment" style="transform: rotate(315deg) skewY(-45deg);"><span style="transform: skewY(45deg) rotate(22deg) translate(40px, -40px);">❌</span></div>
+                        <div id="wheel-center">🎰</div>
+                        <div class="wheel-segment" style="transform: rotate(0deg) skewY(-45deg);"><span>💰</span></div>
+                        <div class="wheel-segment" style="transform: rotate(45deg) skewY(-45deg);"><span>❌</span></div>
+                        <div class="wheel-segment" style="transform: rotate(90deg) skewY(-45deg);"><span>💎</span></div>
+                        <div class="wheel-segment" style="transform: rotate(135deg) skewY(-45deg);"><span>❌</span></div>
+                        <div class="wheel-segment" style="transform: rotate(180deg) skewY(-45deg);"><span>💵</span></div>
+                        <div class="wheel-segment" style="transform: rotate(225deg) skewY(-45deg);"><span>❌</span></div>
+                        <div class="wheel-segment" style="transform: rotate(270deg) skewY(-45deg);"><span>🪙</span></div>
+                        <div class="wheel-segment" style="transform: rotate(315deg) skewY(-45deg);"><span>❌</span></div>
                     </div>
                 </div>
                 
-                <button id="btn-spin" onclick="spinWheel()" class="mt-8 w-full bg-yellow-500 text-slate-900 py-4 rounded-2xl font-black text-lg shadow-[0_4px_0_#a16207] active:shadow-none active:translate-y-1 transition-all">GIRAR AHORA (1 ⚡)</button>
+                <button id="btn-spin" onclick="spinWheel()" class="mt-8 w-full bg-yellow-500 text-slate-900 py-4 rounded-2xl font-black text-lg shadow-[0_5px_0_#854d0e] active:shadow-none active:translate-y-1 transition-all uppercase italic">¡PROBAR SUERTE! (1 ⚡)</button>
             </div>
         </div>
 
-        <div id="tab-mine" class="tab-content text-center pt-6">
-            <div class="glass p-8 rounded-3xl border-t-4 border-cyan-500">
+        <div id="tab-mine" class="tab-content text-center pt-6 px-2">
+            <div class="glass p-8 rounded-3xl border-t-4 border-cyan-500 shadow-2xl">
                 <div class="mb-4">
-                    <p class="text-[10px] text-slate-400 uppercase font-black">Puntos esta sesión</p>
+                    <p class="text-[10px] text-slate-400 uppercase font-black tracking-widest">Ganancia Actual</p>
                     <p class="text-2xl font-bold text-cyan-400">+<span id="session-pts">0</span> pts</p>
                 </div>
-                <p id="mining-timer" class="text-5xl font-mono mb-8 tracking-tighter">03:00:00</p>
-                <button id="btn-mine" onclick="startMining()" class="w-full bg-slate-800 py-4 rounded-2xl font-black border border-white/10 shadow-lg active:bg-slate-700">ACTIVAR MINERÍA (ADS)</button>
+                <p id="mining-timer" class="text-5xl font-mono mb-8 tracking-tighter text-slate-200">03:00:00</p>
+                <button id="btn-mine" onclick="startMining()" class="w-full bg-slate-800 py-4 rounded-2xl font-black border border-white/10 shadow-lg active:bg-slate-700 transition-colors uppercase">Activar Minería</button>
             </div>
         </div>
 
         <div id="tab-refs" class="tab-content px-2 pt-6">
-            <div class="glass p-6 rounded-3xl text-center border-b-4 border-cyan-600">
-                <p class="text-[10px] text-slate-400 font-bold uppercase mb-4">Tu Enlace de Invitación</p>
-                <input type="text" id="ref-link" readonly class="w-full bg-slate-900/50 p-3 rounded-xl text-cyan-400 text-[10px] mb-4 text-center border border-white/5 outline-none">
-                <button onclick="copyRef()" class="w-full bg-cyan-600 py-3 rounded-xl font-black text-sm">COPIAR ENLACE</button>
+            <div class="glass p-6 rounded-3xl text-center border-b-4 border-cyan-600 shadow-2xl">
+                <p class="text-[11px] text-slate-400 font-bold uppercase mb-4 tracking-widest">Invita y Gana 10%</p>
+                <input type="text" id="ref-link" readonly class="w-full bg-slate-900/60 p-4 rounded-xl text-cyan-400 text-[10px] mb-6 text-center border border-white/5 outline-none font-mono">
+                <button onclick="copyRef()" class="w-full bg-cyan-600 py-4 rounded-2xl font-black text-sm shadow-xl active:scale-95">COPIAR ENLACE PERSONAL</button>
             </div>
         </div>
     </main>
 
-    <nav class="fixed bottom-6 left-4 right-4 glass flex justify-around p-4 rounded-3xl shadow-2xl z-50">
-        <button onclick="showTab('home')" class="text-2xl">🏠</button>
-        <button onclick="showTab('wheel')" class="text-2xl">🎡</button>
-        <button onclick="showTab('mine')" class="text-2xl">⛏️</button>
-        <button onclick="showTab('refs')" class="text-2xl">👥</button>
+    <nav class="fixed bottom-6 left-4 right-4 glass flex justify-around p-4 rounded-[30px] shadow-2xl z-50 border border-white/5">
+        <button onclick="showTab('home')" class="text-2xl transition-transform active:scale-125">🏠</button>
+        <button onclick="showTab('wheel')" class="text-2xl transition-transform active:scale-125">🎡</button>
+        <button onclick="showTab('mine')" class="text-2xl transition-transform active:scale-125">⛏️</button>
+        <button onclick="showTab('refs')" class="text-2xl transition-transform active:scale-125">👥</button>
     </nav>
 
     <script>
+        // Variables Globales
         let pts = 0; let energy = 0; let balance = 0.00; let daily = 0.00; 
         let taps = 0; let isMining = false; let sessionPts = 0;
-        let miningSeconds = 10800;
+        let miningSeconds = 10800; // 3 Horas
 
         function triggerPopunder() {
             window.open('https://www.profitablecpmratenetwork.com/hjxx0ympqj?key=3816a45c1ebae2a773ddb3dfcdaa95d5', '_blank');
@@ -150,12 +159,11 @@
             updateUI();
         }
 
-        // --- SISTEMA DE RULETA PREMIUM ---
+        // --- SISTEMA DE RULETA PREMIUM (7 Segundos) ---
         function spinWheel() {
-            if (energy < 1) { alert("¡Necesitas 1 ⚡ de Energía!"); return; }
+            if (energy < 1) { alert("¡Sin energía! Toca en el Home para conseguir más."); return; }
             
-            triggerPopunder(); // Abre el anuncio
-            
+            triggerPopunder(); 
             energy--;
             updateUI();
             
@@ -163,73 +171,68 @@
             const btn = document.getElementById('btn-spin');
             
             btn.disabled = true;
-            btn.innerText = "¡SUERTE!";
+            btn.classList.add('opacity-50');
             
-            // Generar un giro de entre 5 y 10 vueltas completas + ángulo aleatorio
-            const randomExtra = Math.floor(Math.random() * 360);
-            const totalRotation = 3600 + randomExtra; // 10 vueltas (3600deg) + extra
-            
-            wheel.style.transform = `rotate(${totalRotation}deg)`;
+            // Giro largo para suspenso
+            const randomRotation = 3600 + Math.floor(Math.random() * 360);
+            wheel.style.transform = `rotate(${randomRotation}deg)`;
 
             setTimeout(() => {
-                // Reset de rotación visual para el siguiente giro sin que se note el salto
-                wheel.style.transition = 'none';
-                const currentDeg = totalRotation % 360;
-                wheel.style.transform = `rotate(${currentDeg}deg)`;
-                setTimeout(() => wheel.style.transition = 'transform 7s cubic-bezier(0.15, 0, 0.15, 1)', 50);
+                // Estabilizar rotación para el cálculo
+                const finalDeg = randomRotation % 360;
+                
+                // Determinar premio (Flecha arriba es 0deg)
+                // Cada segmento son 45 grados
+                const index = Math.floor(((360 - finalDeg) % 360) / 45);
+                const wins = (index % 2 === 0); // Pares son premios
 
-                btn.disabled = false;
-                btn.innerText = "GIRAR AHORA (1 ⚡)";
-
-                // Lógica de premio (8 segmentos de 45deg cada uno)
-                // Determinamos en qué segmento cayó la flecha (arriba, 0deg)
-                // La flecha está en 0, el premio es (360 - currentDeg)
-                const winIndex = Math.floor(((360 - currentDeg) % 360) / 45);
-                const isWinner = (winIndex % 2 === 0); // Los segmentos pares (0, 2, 4, 6) tienen premio
-
-                if (isWinner) {
-                    const winAmt = (Math.random() * 0.0018).toFixed(4);
-                    if (daily < 0.02) {
+                if (wins) {
+                    const winAmt = (Math.random() * 0.0020).toFixed(4);
+                    if (daily < 0.03) {
                         balance += parseFloat(winAmt);
                         daily += parseFloat(winAmt);
-                        alert(`🎁 ¡INCREÍBLE! Has ganado $${winAmt} USDT.`);
+                        alert(`💎 ¡FANTÁSTICO! Has ganado $${winAmt} USDT.`);
                     } else {
-                        alert("Límite de USDT hoy alcanzado. ¡Mañana más!");
+                        alert("Has alcanzado el límite diario de retiros. ¡Sigue mañana!");
                     }
                 } else {
-                    alert("🎰 ¡Uffs, casi! No te rindas, la próxima será la buena.");
+                    alert("🎰 ¡Uffs, casi! Por un pelo... Inténtalo de nuevo.");
                 }
+
+                btn.disabled = false;
+                btn.classList.remove('opacity-50');
                 updateUI();
-            }, 7000); // Duración del giro de 7 segundos
+            }, 7000); 
         }
 
         // --- REGALO DIARIO ---
         function claimDaily() {
             const last = localStorage.getItem('lastClaim');
             const now = Date.now();
-            if (last && (now - last) < 86400000) { alert("Vuelve mañana para tu regalo."); return; }
+            if (last && (now - last) < 86400000) { alert("Tu regalo se está preparando. Vuelve en unas horas."); return; }
+            
             triggerPopunder();
             energy += 5;
             localStorage.setItem('lastClaim', now);
             updateDailyTimer();
             updateUI();
-            alert("🎁 ¡Recibiste +5 ⚡ de regalo!");
+            alert("🎁 ¡Bono de +5 ⚡ de Energía añadido!");
         }
 
         function updateDailyTimer() {
             const last = localStorage.getItem('lastClaim');
             if (!last) return;
             const next = parseInt(last) + 86400000;
-            const timer = () => {
+            const check = () => {
                 const diff = next - Date.now();
                 if (diff <= 0) { document.getElementById('daily-timer').innerText = "¡Disponible ahora!"; return; }
                 const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
                 const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
                 const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
-                document.getElementById('daily-timer').innerText = `Disponible: ${h}:${m}:${s}`;
-                setTimeout(timer, 1000);
+                document.getElementById('daily-timer').innerText = `Espera: ${h}:${m}:${s}`;
+                setTimeout(check, 1000);
             };
-            timer();
+            check();
         }
 
         // --- MINERIA ---
@@ -237,7 +240,7 @@
             if(isMining) return;
             triggerPopunder();
             isMining = true;
-            document.getElementById('btn-mine').innerText = "MINANDO...";
+            document.getElementById('btn-mine').innerText = "MINANDO ACTIVAMENTE...";
             document.getElementById('mining-timer').classList.add('mining-active');
             
             const timerInterval = setInterval(() => {
@@ -246,8 +249,20 @@
                 let m = Math.floor((miningSeconds % 3600) / 60).toString().padStart(2, '0');
                 let s = (miningSeconds % 60).toString().padStart(2, '0');
                 document.getElementById('mining-timer').innerText = `${h}:${m}:${s}`;
-                if (miningSeconds % 10 === 0) { pts += 1; sessionPts += 1; document.getElementById('session-pts').innerText = sessionPts; updateUI(); }
-                if (miningSeconds <= 0) { clearInterval(timerInterval); isMining = false; }
+                
+                if (miningSeconds % 10 === 0) { 
+                    pts += 1; sessionPts += 1; 
+                    document.getElementById('session-pts').innerText = sessionPts;
+                    updateUI(); 
+                }
+
+                if (miningSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    isMining = false;
+                    miningSeconds = 10800;
+                    document.getElementById('btn-mine').innerText = "ACTIVAR MINERÍA";
+                    document.getElementById('mining-timer').classList.remove('mining-active');
+                }
             }, 1000);
         }
 
@@ -272,17 +287,24 @@
         function copyRef() {
             const el = document.getElementById('ref-link');
             el.select(); document.execCommand('copy');
-            alert("¡Enlace copiado!");
+            alert("¡Link copiado al portapapeles!");
         }
 
+        // Integración con Telegram WebApp
         const tg = window.Telegram.WebApp;
         tg.expand();
+        tg.headerColor = '#0f172a';
+
         window.onload = () => {
             updateDailyTimer();
             const user = tg.initDataUnsafe.user;
-            if (user) document.getElementById('ref-link').value = "https://t.me/RostyLuckyBot/play?start=" + user.id;
+            if (user) {
+                document.getElementById('ref-link').value = "https://t.me/RostyLuckyBot/play?start=" + user.id;
+            }
         };
     </script>
+    
     <script src="https://pl29089430.profitablecpmratenetwork.com/dc/73/a2/dc73a2370cdcfb545e7a197bc8bb269a.js"></script>
+
 </body>
 </html>
