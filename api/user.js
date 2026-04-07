@@ -1,46 +1,56 @@
-const { MongoClient, ObjectId } = require('mongodb');
+const { MongoClient } = require('mongodb');
+const uri = process.env.MONGODB_URI;
+const client = new MongoClient(uri);
 
-// URL de conexión (la que copiaste de MongoDB Atlas)
-const url = process.env.MONGODB_URI; 
-const dbName = 'rostylucky';
-
-async function connectToDatabase() {
-    const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
+export default async function handler(req, res) {
     await client.connect();
-    return client.db(dbName);
-}
+    const db = client.db('rostylucky_db');
+    const users = db.collection('users');
+    const { id, referrer } = req.query;
 
-module.exports = async (req, res) => {
-    // Para validación de seguridad de Telegram
-    const userId = req.query.id; 
-    if (!userId) return res.status(400).json({ error: 'ID de usuario requerido' });
-
-    const db = await connectToDatabase();
-    const usersCollection = db.collection('users');
-
-    let user = await usersCollection.findOne({ telegramId: userId });
-
-    if (!user) {
-        // Registrar nuevo usuario
-        user = {
-            telegramId: userId,
-            level: 1,
-            points: 0,
-            energy: 0,
-            balanceUSDT: 0.00,
-            lastMining: null,
-            tapCount: 0
-        };
-        await usersCollection.insertOne(user);
+    if (req.method === 'GET') {
+        let user = await users.findOne({ telegramId: id });
+        if (!user) {
+            user = { 
+                telegramId: id, 
+                points: 0, 
+                level: 1, 
+                energy: 0, 
+                balance: 0,
+                referredBy: referrer || null, // Guarda quién lo invitó
+                lastAction: Date.now() 
+            };
+            await users.insertOne(user);
+        }
+        return res.status(200).json(user);
     }
 
     if (req.method === 'POST') {
-        // Guardar cambios (cuando el usuario cierra la app o gana algo)
-        const updateData = req.body;
-        await usersCollection.updateOne({ _auth: userId }, { $set: updateData });
-        return res.json({ status: 'success' });
-    }
+        const { type, amount } = req.body;
+        const user = await users.findOne({ telegramId: id });
 
-    // Por defecto (GET), devuelve los datos del usuario
-    res.json(user);
-};
+        // --- CAPA 1: ANTI-BOT DE TIEMPO ---
+        const now = Date.now();
+        const diff = now - user.lastAction;
+        if (diff < 500 && type === 'tap') { // Si hace taps en menos de 0.5 seg constantes
+            return res.status(403).json({ error: "Actividad sospechosa detectada" });
+        }
+
+        // --- CAPA 2: SISTEMA DE REFERIDOS (10%) ---
+        if (user.referredBy && amount > 0) {
+            const commission = amount * 0.10;
+            await users.updateOne(
+                { telegramId: user.referredBy },
+                { $inc: { balance: commission } }
+            );
+        }
+
+        // Actualizar datos del usuario
+        await users.updateOne(
+            { telegramId: id },
+            { $inc: { [type]: amount }, $set: { lastAction: now } }
+        );
+        
+        return res.status(200).json({ success: true });
+    }
+}
