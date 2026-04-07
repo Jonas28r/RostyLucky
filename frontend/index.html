@@ -1,1 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
 
+<meta charset="UTF-8">
+<title>RostyLucky</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+
+body{
+background:#0f172a;
+color:white;
+font-family:Arial;
+text-align:center;
+}
+
+button{
+padding:12px;
+margin:10px;
+border:none;
+border-radius:10px;
+background:#6366f1;
+color:white;
+font-size:16px;
+}
+
+#tap{
+font-size:30px;
+}
+
+#board{
+display:grid;
+grid-template-columns:repeat(6,50px);
+gap:5px;
+justify-content:center;
+margin-top:20px;
+}
+
+.candy{
+width:50px;
+height:50px;
+border-radius:10px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>🍀 RostyLucky</h2>
+
+<p>Balance: <span id="balance">0</span> USDT</p>
+
+<button onclick="startMining()">⛏ Activar minería</button>
+
+<button id="tap" onclick="tap()">⚡ TAP</button>
+
+<p>Energía: <span id="energy">0</span></p>
+
+<button onclick="spin()">🎰 Ruleta</button>
+
+<h3>Candy Game</h3>
+
+<div id="board"></div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
