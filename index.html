@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RostyLucky - Play & Earn</title>
+    <title>RostyLucky - Play & Earn Global</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -14,19 +14,22 @@
         #tap-area:active { transform: scale(0.92); }
         .anim-float { position: absolute; font-weight: 800; color: #facc15; pointer-events: none; animation: floatUp 0.6s ease-out forwards; z-index: 50; }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px); } }
+        /* Animación Ruleta */
         .spinning { animation: rotate 2s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .mining-active { color: #22d3ee; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     </style>
 </head>
 <body class="p-4">
 
-    <div class="glass p-4 rounded-2xl mb-4 flex justify-between items-center shadow-2xl">
+    <div class="glass p-4 rounded-2xl mb-4 flex justify-between items-center shadow-2xl border-b-2 border-yellow-500/20">
         <div>
-            <p class="text-[10px] text-slate-400 font-bold uppercase">Puntos</p>
+            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Puntos</p>
             <p class="text-xl font-black text-yellow-400" id="display-pts">0</p>
         </div>
         <div class="text-right">
-            <p class="text-[10px] text-slate-400 font-bold uppercase italic text-[9px]">Balance Hoy: $<span id="daily-earned">0.00</span>/0.02</p>
+            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest italic">Balance USDT</p>
             <p class="text-xl font-black text-green-400">$<span id="user-balance">0.0000</span></p>
         </div>
     </div>
@@ -41,32 +44,36 @@
             <div id="tap-area" ontouchstart="handleTap(event)" class="relative mx-auto w-60 h-60 bg-gradient-to-tr from-yellow-600 to-orange-400 rounded-full flex items-center justify-center shadow-[0_0_60px_rgba(234,179,8,0.2)] border-[12px] border-white/5 active:scale-90 transition-transform">
                 <span class="text-8xl font-black italic text-white/20 select-none">R</span>
             </div>
-            <p class="mt-8 text-slate-500 text-xs uppercase tracking-widest">100 Taps = 1 Energía</p>
+            <p class="mt-8 text-slate-500 text-[10px] uppercase tracking-[0.2em]">100 Taps = 1 Energía</p>
         </div>
 
         <div id="tab-wheel" class="tab-content text-center pt-6">
             <div class="glass p-6 rounded-3xl mb-4">
-                <h2 class="text-xl font-bold mb-4 italic text-yellow-400 tracking-tighter">Lucky Spin</h2>
+                <h2 class="text-xl font-bold mb-4 italic text-yellow-400">Lucky Spin</h2>
                 <div id="wheel-graphic" class="w-48 h-48 mx-auto bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 rounded-full border-8 border-slate-800 flex items-center justify-center shadow-2xl relative">
-                    <div class="w-1 h-10 bg-white absolute top-0 rounded-full"></div>
+                    <div class="w-1 h-10 bg-white absolute top-0 rounded-full shadow-lg"></div>
                     <span class="text-4xl">🎁</span>
                 </div>
-                <button onclick="spinWheel()" class="mt-6 w-full bg-yellow-500 text-slate-900 py-4 rounded-2xl font-black text-lg shadow-xl active:scale-95 transition-all">GIRAR (CONSUME 1 ⚡)</button>
+                <p class="mt-4 text-sm text-slate-300 italic">Costo: 1 Energía</p>
+                <button onclick="spinWheel()" class="mt-6 w-full bg-yellow-500 text-slate-900 py-4 rounded-2xl font-black text-lg shadow-xl active:scale-95 transition-all uppercase">GIRAR AHORA</button>
             </div>
+            <p class="text-[9px] text-slate-500 uppercase tracking-widest">Premios aleatorios hasta $0.02 diarios</p>
         </div>
 
         <div id="tab-mine" class="tab-content text-center pt-6">
             <div class="glass p-8 rounded-3xl border-t-4 border-cyan-500">
+                <h2 class="text-xs font-black text-cyan-400 mb-2 uppercase tracking-widest italic">Cloud Mining Session</h2>
                 <p id="mining-timer" class="text-5xl font-mono mb-8 tracking-tighter">03:00:00</p>
-                <button onclick="triggerPopunder()" class="w-full bg-cyan-600 py-4 rounded-2xl font-black shadow-lg">ACTIVAR MINERÍA</button>
+                <button id="btn-mine" onclick="startMining()" class="w-full bg-slate-800 py-4 rounded-2xl font-black border border-white/10 shadow-lg active:bg-slate-700">ACTIVAR MINERÍA (ADS)</button>
             </div>
         </div>
 
         <div id="tab-refs" class="tab-content">
             <div class="glass p-6 rounded-3xl mb-4 text-center">
+                <p class="text-xs text-slate-400 mb-1 font-bold uppercase">Tu Enlace Global</p>
                 <input type="text" id="ref-link" readonly class="w-full bg-transparent text-cyan-400 text-[10px] mb-4 text-center outline-none border-b border-white/10 pb-2" value="Cargando link...">
                 <button onclick="copyRef()" class="w-full bg-cyan-600 py-3 rounded-xl font-black text-sm mb-4">COPIAR LINK</button>
-                <a href="https://www.profitablecpmratenetwork.com/hjxx0ympqj?key=3816a45c1ebae2a773ddb3dfcdaa95d5" target="_blank" class="block w-full bg-white/5 border border-white/10 py-3 rounded-xl text-xs font-bold">🎁 OBTENER ENERGÍA EXTRA</a>
+                <a href="https://www.profitablecpmratenetwork.com/hjxx0ympqj?key=3816a45c1ebae2a773ddb3dfcdaa95d5" target="_blank" class="block w-full bg-white/5 border border-white/10 py-3 rounded-xl text-xs font-bold">🎁 ENERGÍA EXTRA (DIRECT LINK)</a>
             </div>
         </div>
     </main>
@@ -80,11 +87,11 @@
 
     <script>
         let pts = 0; let energy = 0; let balance = 0.00; let daily = 0.00; let taps = 0;
-        let lastTap = 0; let fastTaps = 0;
+        let lastTap = 0; let fastTaps = 0; let isMining = false;
 
         function handleTap(e) {
             const now = Date.now();
-            if (now - lastTap < 100) { fastTaps++; if (fastTaps > 12) return; } else { fastTaps = 0; }
+            if (now - lastTap < 80) { fastTaps++; if (fastTaps > 15) return; } else { fastTaps = 0; }
             lastTap = now;
 
             const touch = e.touches[0];
@@ -95,25 +102,58 @@
         }
 
         function triggerPopunder() {
-            // CARGA EL POPUNDER SOLO AL HACER CLIC AQUÍ
-            const script = document.createElement('script');
-            script.src = "//pl29089431.profitablecpmratenetwork.com/e3/e1/11/e3e11159181e7b873ee93e0a171a4d95.js";
-            document.body.appendChild(script);
-            alert("Minería Activada. El anuncio nos ayuda a mantener los pagos.");
+            // Disparar anuncio sin bloquear el hilo principal
+            const popUrl = 'https://www.profitablecpmratenetwork.com/hjxx0ympqj?key=3816a45c1ebae2a773ddb3dfcdaa95d5';
+            const adWin = window.open(popUrl, '_blank');
+            
+            // Si el navegador bloquea el pop-up, inyectamos el script como respaldo
+            if(!adWin) {
+                const s = document.createElement('script');
+                s.src = "//pl29089431.profitablecpmratenetwork.com/e3/e1/11/e3e11159181e7b873ee93e0a171a4d95.js";
+                document.body.appendChild(s);
+            }
         }
 
         function spinWheel() {
-            if (energy < 1) { alert("¡Sin energía! Haz Tap Tap."); return; }
-            triggerPopunder(); // Dispara el popunder antes de girar
+            if (energy < 1) { alert("¡Necesitas 1 de Energía! Haz más Tap Tap."); return; }
+            
+            triggerPopunder(); // Dispara anuncio pero continúa abajo...
+            
             energy--;
             const wheel = document.getElementById('wheel-graphic');
             wheel.classList.add('spinning');
+            updateUI();
+
             setTimeout(() => {
                 wheel.classList.remove('spinning');
                 const win = (Math.random() * 0.0015).toFixed(4);
-                if (daily < 0.02) { balance += parseFloat(win); daily += parseFloat(win); alert("¡Ganaste $" + win + "!"); }
+                if (daily < 0.02) {
+                    balance += parseFloat(win);
+                    daily += parseFloat(win);
+                    alert("🎡 ¡Felicidades! Ganaste $" + win);
+                } else {
+                    alert("Límite diario de USDT alcanzado. ¡Vuelve mañana!");
+                }
                 updateUI();
-            }, 2000);
+            }, 2500);
+        }
+
+        function startMining() {
+            if(isMining) return;
+            
+            triggerPopunder(); // Dispara anuncio pero continúa abajo...
+
+            isMining = true;
+            document.getElementById('btn-mine').innerText = "MINERÍA ACTIVA";
+            document.getElementById('mining-timer').classList.add('mining-active');
+            
+            alert("⛏️ Sesión de minería iniciada con éxito.");
+
+            // Lógica de puntos pasivos cada 10 segundos mientras la app esté abierta
+            setInterval(() => {
+                pts += 1;
+                updateUI();
+            }, 10000);
         }
 
         function createFloat(x, y) {
@@ -131,21 +171,21 @@
         function updateUI() {
             document.getElementById('display-pts').innerText = pts;
             document.getElementById('user-balance').innerText = balance.toFixed(4);
-            document.getElementById('daily-earned').innerText = daily.toFixed(2);
             document.getElementById('user-energy').innerText = energy;
         }
 
         function copyRef() {
             const el = document.getElementById('ref-link');
             el.select(); document.execCommand('copy');
-            alert("Link copiado.");
+            alert("¡Link copiado al portapapeles!");
         }
 
+        // Init Telegram y Link
         const tg = window.Telegram.WebApp;
         tg.expand();
         window.onload = () => {
             const user = tg.initDataUnsafe.user;
-            if (user) document.getElementById('ref-link').value = "https://t.me/RostyLuckyBot?start=" + user.id;
+            if (user) document.getElementById('ref-link').value = "https://t.me/RostyLuckyBot/play?start=" + user.id;
         };
     </script>
 
