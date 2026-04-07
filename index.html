@@ -3,143 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RostyLucky - Wallet & Mining</title>
+    <title>RostyLucky Elite</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background: #0f172a; color: white; font-family: 'Inter', sans-serif; overflow: hidden; user-select: none; }
+        body { background: #0f172a; color: white; font-family: 'Inter', sans-serif; overflow: hidden; user-select: none; -webkit-tap-highlight-color: transparent; }
         .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
-        .tab-content { display: none; height: 75vh; overflow-y: auto; padding-bottom: 120px; }
+        .tab-content { display: none; height: 72vh; overflow-y: auto; padding-bottom: 100px; }
         .active-tab { display: block; }
         
-        /* Ruleta con Offset de Seguridad */
-        #wheel-container { position: relative; width: 280px; height: 280px; margin: 0 auto; }
-        #wheel-main { 
-            width: 100%; height: 100%; border-radius: 50%; border: 6px solid #1e293b;
-            position: relative; overflow: hidden; 
-            transition: transform 8s cubic-bezier(0.1, 0, 0, 1);
-            background: conic-gradient(
-                #facc15 0deg 45deg, #eab308 45deg 90deg, 
-                #facc15 90deg 135deg, #eab308 135deg 180deg,
-                #facc15 180deg 225deg, #eab308 225deg 270deg,
-                #facc15 270deg 315deg, #eab308 315deg 360deg
-            );
-        }
-        .wheel-segment { position: absolute; width: 50%; height: 50%; transform-origin: 100% 100%; display: flex; align-items: center; justify-content: center; }
-        .wheel-segment span { position: absolute; font-size: 22px; transform: skewY(45deg) rotate(22.5deg) translateY(-85px); }
-        .wheel-marker { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); width: 34px; height: 44px; background: #ef4444; clip-path: polygon(0% 0%, 100% 0%, 50% 100%); z-index: 30; }
+        /* Burbujas Tap Tap */
+        .bubble { position: absolute; pointer-events: none; font-weight: 900; color: #22d3ee; animation: bubbleUp 0.8s ease-out forwards; z-index: 1000; font-size: 24px; text-shadow: 0 0 10px #22d3ee; }
+        @keyframes bubbleUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px) translateX(20px); } }
 
-        /* Estilos Wallet */
-        .method-card { background: rgba(15, 23, 42, 0.8); border: 1px solid #334155; padding: 15px; border-radius: 15px; margin-bottom: 10px; transition: all 0.3s; }
-        .method-card:active { border-color: #facc15; transform: scale(0.98); }
-        
-        /* Modal */
-        #modal-withdraw { display:none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+        /* Ruleta Calibrada */
+        #wheel-main { width: 280px; height: 280px; border-radius: 50%; border: 6px solid #1e293b; transition: transform 8s cubic-bezier(0.1, 0, 0, 1); background: conic-gradient(#facc15 0 45deg, #eab308 45deg 90deg, #facc15 90deg 135deg, #eab308 135deg 180deg, #facc15 180deg 225deg, #eab308 225deg 270deg, #facc15 270deg 315deg, #eab308 315deg 360deg); }
+        .wheel-marker { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 30px; height: 40px; background: #ef4444; clip-path: polygon(0 0, 100% 0, 50% 100%); z-index: 50; }
+
+        /* Anuncios */
+        #social-bar-container { width: 100%; display: flex; justify-content: center; margin-top: 15px; min-height: 50px; }
     </style>
 </head>
 <body class="p-4">
 
-    <div class="glass p-4 rounded-2xl mb-4 shadow-2xl">
-        <div class="flex justify-between items-center">
-            <div>
-                <p class="text-[10px] text-slate-400 font-bold uppercase">PUNTOS</p>
-                <p class="text-xl font-black text-yellow-400" id="display-pts">0</p>
-            </div>
-            <div class="text-right">
-                <p class="text-[10px] text-slate-400 font-bold uppercase">BALANCE USDT</p>
-                <p class="text-xl font-black text-green-400" id="user-balance">$0.0000</p>
-            </div>
-        </div>
+    <div class="glass p-4 rounded-2xl mb-4 flex justify-between items-center border-b-2 border-yellow-500/20">
+        <div><p class="text-[10px] text-slate-400 font-bold uppercase">Minería Activa</p><p class="text-xl font-black text-yellow-400" id="display-pts">0 pts</p></div>
+        <div class="text-right"><p class="text-[10px] text-slate-400 font-bold uppercase italic">Balance Real</p><p class="text-xl font-black text-green-400">$<span id="user-balance">0.0000</span></p></div>
     </div>
 
     <main>
         <div id="tab-home" class="tab-content active-tab text-center">
-            <div class="mb-4 mt-10">
-                <span class="bg-cyan-950 text-cyan-400 px-5 py-2 rounded-full text-[10px] font-black border border-cyan-500/30">
-                    ⚡ ENERGÍA: <span id="user-energy">0</span>
-                </span>
+            <div class="mb-4 mt-4"><span class="bg-cyan-950 text-cyan-400 px-4 py-1 rounded-full text-[10px] font-black border border-cyan-500/30">⚡ ENERGÍA: <span id="user-energy">0</span></span></div>
+            <div id="tap-area" ontouchstart="handleTap(event)" class="relative mx-auto w-56 h-56 bg-gradient-to-tr from-yellow-600 to-orange-400 rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(234,179,8,0.3)] border-[10px] border-white/10 active:scale-95 transition-transform">
+                <span class="text-8xl font-black italic text-white/20 select-none">R</span>
             </div>
-            <div id="tap-area" ontouchstart="handleTap(event)" class="relative mx-auto w-60 h-60 bg-gradient-to-tr from-yellow-600 to-orange-400 rounded-full flex items-center justify-center shadow-[0_0_60px_rgba(234,179,8,0.4)] border-[12px] border-white/10 active:scale-95 transition-transform">
-                <span class="text-9xl font-black italic text-white/20">R</span>
+            
+            <div id="social-bar-container">
+                <script src="https://pl29089430.profitablecpmratenetwork.com/dc/73/a2/dc73a2370cdcfb545e7a197bc8bb269a.js"></script>
             </div>
-            <p class="text-slate-500 text-[10px] font-bold uppercase tracking-[0.4em] mt-6">Tap para generar energía</p>
+            <p class="text-slate-500 text-[10px] font-bold uppercase tracking-[0.3em] mt-4">Toca para ganar energía</p>
         </div>
 
         <div id="tab-wheel" class="tab-content text-center pt-4">
-            <div class="glass p-6 rounded-[45px] relative">
+            <div class="glass p-6 rounded-[40px] relative">
                 <div class="wheel-marker"></div>
-                <div id="wheel-container">
-                    <div id="wheel-main">
-                        <div class="wheel-segment" style="transform: rotate(0deg) skewY(-45deg);"><span>💰</span></div>
-                        <div class="wheel-segment" style="transform: rotate(45deg) skewY(-45deg);"><span>❌</span></div>
-                        <div class="wheel-segment" style="transform: rotate(90deg) skewY(-45deg);"><span>💎</span></div>
-                        <div class="wheel-segment" style="transform: rotate(135deg) skewY(-45deg);"><span>❌</span></div>
-                        <div class="wheel-segment" style="transform: rotate(180deg) skewY(-45deg);"><span>💵</span></div>
-                        <div class="wheel-segment" style="transform: rotate(225deg) skewY(-45deg);"><span>❌</span></div>
-                        <div class="wheel-segment" style="transform: rotate(270deg) skewY(-45deg);"><span>🪙</span></div>
-                        <div class="wheel-segment" style="transform: rotate(315deg) skewY(-45deg);"><span>❌</span></div>
-                    </div>
-                </div>
-                <button id="btn-spin" onclick="spinWheel()" class="mt-8 w-full bg-yellow-500 text-slate-900 py-4 rounded-2xl font-black uppercase italic italic tracking-widest">¡PROBAR SUERTE! (1 ⚡)</button>
+                <center><div id="wheel-main"></div></center>
+                <button id="btn-spin" onclick="spinWheel()" class="mt-8 w-full bg-yellow-500 text-slate-900 py-4 rounded-2xl font-black uppercase italic tracking-widest">¡GIRAR! (1 ⚡)</button>
             </div>
         </div>
 
         <div id="tab-mine" class="tab-content text-center pt-10">
-            <div class="glass p-8 rounded-3xl border-t-4 border-cyan-500 shadow-2xl">
-                <p class="text-[10px] text-slate-400 uppercase font-black mb-2">Ingresos Pasivos</p>
-                <p id="mining-timer" class="text-6xl font-mono mb-8 text-white">03:00:00</p>
-                <button id="btn-mine" onclick="startMining()" class="w-full bg-cyan-600 py-4 rounded-2xl font-black shadow-lg">ACTIVAR MINERÍA</button>
+            <div class="glass p-8 rounded-3xl border-t-4 border-green-500 shadow-2xl">
+                <p class="text-[10px] text-slate-400 uppercase font-black mb-2">Minería Directa USDT</p>
+                <p id="mining-timer" class="text-5xl font-mono mb-8 text-white">03:00:00</p>
+                <button id="btn-mine" onclick="startMining()" class="w-full bg-green-600 py-4 rounded-2xl font-black shadow-lg">ACTIVAR MINA USDT</button>
+                <p class="text-[9px] text-green-400 mt-4 uppercase font-bold tracking-tighter">Generando $0.0001 cada 10 seg</p>
             </div>
         </div>
 
-        <div id="tab-refs" class="tab-content px-2 pt-6">
-            <h2 class="text-center font-black text-xl mb-6 italic text-yellow-400">CENTRO DE RETIROS</h2>
-            
-            <div onclick="openWithdraw('pago_movil')" class="method-card flex justify-between items-center cursor-pointer">
-                <div class="flex items-center gap-3">
-                    <span class="text-2xl">🇻🇪</span>
-                    <div><p class="font-bold text-sm">Pago Móvil</p><p class="text-[9px] text-slate-400">Mínimo: $1.00</p></div>
-                </div>
-                <span class="text-xs font-black text-cyan-400">RETIRAR</span>
+        <div id="tab-wallet" class="tab-content px-2 pt-4">
+            <div class="flex gap-2 mb-6">
+                <button onclick="showSection('withdraw')" class="flex-1 bg-yellow-500 text-slate-900 py-2 rounded-xl font-black text-xs uppercase">Retiros</button>
+                <button onclick="showSection('refs')" class="flex-1 bg-slate-800 py-2 rounded-xl font-black text-xs uppercase">Referidos</button>
             </div>
 
-            <div onclick="openWithdraw('ton')" class="method-card flex justify-between items-center cursor-pointer">
-                <div class="flex items-center gap-3">
-                    <span class="text-2xl">💎</span>
-                    <div><p class="font-bold text-sm">TON Wallet</p><p class="text-[9px] text-slate-400">Mínimo: $5.00</p></div>
-                </div>
-                <span class="text-xs font-black text-slate-500">RETIRAR</span>
+            <div id="section-withdraw" class="space-y-3">
+                <div onclick="openModal('pago_movil')" class="glass p-4 rounded-xl flex justify-between items-center"><span>🇻🇪 Pago Móvil</span><span class="text-[10px] text-cyan-400 font-bold">MIN $1</span></div>
+                <div onclick="openModal('ton')" class="glass p-4 rounded-xl flex justify-between items-center"><span>💎 TON Wallet</span><span class="text-[10px] text-slate-400 font-bold">MIN $5</span></div>
+                <div onclick="openModal('airtm')" class="glass p-4 rounded-xl flex justify-between items-center"><span>☁️ Airtm</span><span class="text-[10px] text-slate-400 font-bold">MIN $5</span></div>
+                <div onclick="openModal('paypal')" class="glass p-4 rounded-xl flex justify-between items-center"><span>🅿️ PayPal</span><span class="text-[10px] text-slate-400 font-bold">MIN $5</span></div>
             </div>
 
-            <div onclick="openWithdraw('airtm')" class="method-card flex justify-between items-center cursor-pointer">
-                <div class="flex items-center gap-3">
-                    <span class="text-2xl">☁️</span>
-                    <div><p class="font-bold text-sm">Airtm</p><p class="text-[9px] text-slate-400">Mínimo: $5.00</p></div>
-                </div>
-                <span class="text-xs font-black text-slate-500">RETIRAR</span>
-            </div>
-
-            <div onclick="openWithdraw('paypal')" class="method-card flex justify-between items-center cursor-pointer">
-                <div class="flex items-center gap-3">
-                    <span class="text-2xl">🅿️</span>
-                    <div><p class="font-bold text-sm">PayPal</p><p class="text-[9px] text-slate-400">Mínimo: $5.00</p></div>
-                </div>
-                <span class="text-xs font-black text-slate-500">RETIRAR</span>
+            <div id="section-refs" style="display:none;" class="glass p-6 rounded-2xl text-center">
+                <p class="text-xs font-bold mb-4">Invita y gana el 10% de sus retiros</p>
+                <input type="text" id="ref-link" readonly class="w-full bg-black/40 p-3 rounded-lg text-[10px] text-center mb-4 text-yellow-400 border border-yellow-500/20">
+                <button onclick="copyRef()" class="w-full bg-cyan-600 py-3 rounded-xl font-black text-xs uppercase">Copiar Link de Invitado</button>
             </div>
         </div>
     </main>
 
-    <div id="modal-withdraw">
-        <div class="glass p-6 rounded-3xl w-full max-w-xs text-center">
-            <h3 id="m-title" class="font-black text-yellow-400 mb-4 uppercase">RETIRAR</h3>
-            <div class="mb-4">
-                <input type="number" id="w-amount" step="0.01" placeholder="Monto en USD" oninput="calcVES()" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-center text-white font-bold">
-                <p id="ves-hint" class="text-cyan-400 text-[10px] font-black mt-2"></p>
-            </div>
-            <div id="m-fields" class="space-y-2 mb-6"></div>
+    <div id="withdraw-modal" class="fixed inset-0 bg-black/90 z-[2000] hidden items-center justify-center p-6">
+        <div class="glass p-6 rounded-3xl w-full text-center">
+            <h3 id="modal-title" class="font-black text-yellow-400 mb-4 uppercase"></h3>
+            <input type="number" id="w-amount" step="0.01" placeholder="Monto USD" oninput="calcVes()" class="w-full bg-slate-900 p-3 rounded-xl text-center font-bold mb-2">
+            <p id="ves-preview" class="text-cyan-400 text-[10px] font-black mb-4"></p>
+            <div id="modal-fields" class="space-y-2 mb-6"></div>
             <div class="flex gap-2">
-                <button onclick="closeWithdraw()" class="flex-1 bg-slate-800 py-3 rounded-xl font-bold text-xs">CANCELAR</button>
-                <button onclick="confirmWithdraw()" class="flex-1 bg-yellow-500 text-slate-900 py-3 rounded-xl font-black text-xs">CONFIRMAR</button>
+                <button onclick="closeModal()" class="flex-1 bg-slate-800 py-3 rounded-xl text-xs">CERRAR</button>
+                <button onclick="submitWithdraw()" class="flex-1 bg-yellow-500 text-slate-900 py-3 rounded-xl font-black text-xs">CONFIRMAR</button>
             </div>
         </div>
     </div>
@@ -148,109 +99,133 @@
         <button onclick="showTab('home')" class="text-2xl">🏠</button>
         <button onclick="showTab('wheel')" class="text-2xl">🎡</button>
         <button onclick="showTab('mine')" class="text-2xl">⛏️</button>
-        <button onclick="showTab('refs')" class="text-2xl">💰</button>
+        <button onclick="showTab('wallet')" class="text-2xl">💰</button>
     </nav>
 
     <script>
-        let pts = 0; let energy = 0; let balance = 0.00;
-        let miningSeconds = 10800; // 3 horas
-        const TASA_VES = 521.42; // TASA ACTUALIZADA
-        let currentM = "";
+        let balance = 0.00; let energy = 0; let pts = 0;
+        let isMining = false; let miningSeconds = 10800;
+        const TASA_VES = 521.42;
+        let activeMethod = "";
+
+        // Popunder y Direct Link (Adsterra)
+        function triggerAds() {
+            window.open('https://www.profitablecpmratenetwork.com/hjxx0ympqj?key=3816a45c1ebae2a773ddb3dfcdaa95d5', '_blank');
+        }
 
         function showTab(id) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active-tab'));
             document.getElementById('tab-' + id).classList.add('active-tab');
         }
 
+        function showSection(id) {
+            document.getElementById('section-withdraw').style.display = id === 'withdraw' ? 'block' : 'none';
+            document.getElementById('section-refs').style.display = id === 'refs' ? 'block' : 'none';
+        }
+
+        // Tap Tap +1 Burbujas
         function handleTap(e) {
-            pts++; if(pts % 50 === 0) energy++;
+            pts++; if(pts % 40 === 0) energy++;
+            const x = e.touches[0].clientX; const y = e.touches[0].clientY;
+            const b = document.createElement("div");
+            b.className = "bubble"; b.innerText = "+1";
+            b.style.left = x + "px"; b.style.top = y + "px";
+            document.body.appendChild(b);
+            setTimeout(() => b.remove(), 800);
             updateUI();
         }
 
-        // --- RULETA RECALIBRADA (Offset 22.5) ---
+        // Ruleta Calibrada (Offset 22.5)
         function spinWheel() {
-            if(energy < 1) { alert("¡Sin energía!"); return; }
+            if(energy < 1) return alert("¡Sin energía!");
+            triggerAds();
             energy--; updateUI();
             const wheel = document.getElementById('wheel-main');
-            const targetIdx = Math.floor(Math.random() * 8);
-            const extraSpins = 3600; // 10 vueltas
-            const finalDeg = (360 - (targetIdx * 45)) + 22.5; // Offset central
-            wheel.style.transform = `rotate(${extraSpins + finalDeg}deg)`;
-            
+            const target = Math.floor(Math.random() * 8);
+            const deg = (3600) + (360 - (target * 45)) + 22.5; 
+            wheel.style.transform = `rotate(${deg}deg)`;
             setTimeout(() => {
-                const wins = [0, 2, 4, 6];
-                if(wins.includes(targetIdx)) {
-                    let win = 0.0005; balance += win;
+                if([0, 2, 4, 6].includes(target)) {
+                    const win = 0.0005; balance += win;
                     alert("¡Ganaste $" + win + " USDT!");
-                } else { alert("Sigue intentando ❌"); }
-                wheel.style.transition = 'none';
-                wheel.style.transform = `rotate(${finalDeg}deg)`;
-                setTimeout(()=> wheel.style.transition = 'transform 8s cubic-bezier(0.1, 0, 0, 1)', 50);
+                } else { alert("❌ Sigue intentando"); }
                 updateUI();
             }, 8200);
         }
 
-        // --- MINERIA ACTIVA (RELOJ CORREGIDO) ---
+        // Minería USDT REAL
         function startMining() {
-            document.getElementById('btn-mine').disabled = true;
-            document.getElementById('btn-mine').innerText = "MINANDO...";
-            const timerObj = document.getElementById('mining-timer');
-            
-            const timerInterval = setInterval(() => {
+            if(isMining) return;
+            triggerAds();
+            isMining = true;
+            document.getElementById('btn-mine').innerText = "MINANDO USDT...";
+            const clock = document.getElementById('mining-timer');
+            const interval = setInterval(() => {
                 miningSeconds--;
-                let h = Math.floor(miningSeconds / 3600);
-                let m = Math.floor((miningSeconds % 3600) / 60);
-                let s = miningSeconds % 60;
-                
-                // Actualización visual forzada por cada segundo
-                timerObj.innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-                
-                if(miningSeconds % 10 === 0) { pts += 5; updateUI(); }
-                if(miningSeconds <= 0) clearInterval(timerInterval);
+                let h = Math.floor(miningSeconds/3600), m = Math.floor((miningSeconds%3600)/60), s = miningSeconds%60;
+                clock.innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+                if(miningSeconds % 10 === 0) { balance += 0.0001; updateUI(); }
+                if(miningSeconds <= 0) clearInterval(interval);
             }, 1000);
         }
 
-        // --- WALLET LOGIC ---
-        function openWithdraw(m) {
-            currentM = m;
-            document.getElementById('modal-withdraw').style.display = "flex";
-            const fields = document.getElementById('m-fields');
-            fields.innerHTML = "";
+        // Wallet Logic
+        function openModal(m) {
+            activeMethod = m;
+            document.getElementById('withdraw-modal').style.flex = "flex";
+            document.getElementById('withdraw-modal').classList.remove('hidden');
+            document.getElementById('modal-fields').innerHTML = "";
+            const title = document.getElementById('modal-title');
+            const fields = document.getElementById('modal-fields');
+
             if(m === 'pago_movil') {
-                fields.innerHTML = `
-                    <input type="text" id="v-bank" placeholder="Banco (Ej: BDV)" class="w-full bg-slate-900 p-3 rounded-xl text-xs">
-                    <input type="text" id="v-id" placeholder="Cédula" class="w-full bg-slate-900 p-3 rounded-xl text-xs">
-                    <input type="text" id="v-phone" placeholder="Teléfono" class="w-full bg-slate-900 p-3 rounded-xl text-xs">
-                `;
+                title.innerText = "Pago Móvil VZLA";
+                fields.innerHTML = `<input type='text' id='f1' placeholder='Banco' class='w-full bg-slate-800 p-3 rounded-lg text-xs'><input type='text' id='f2' placeholder='Cédula' class='w-full bg-slate-800 p-3 rounded-lg text-xs'><input type='text' id='f3' placeholder='Teléfono' class='w-full bg-slate-800 p-3 rounded-lg text-xs'>`;
             } else {
-                fields.innerHTML = `<input type="text" id="v-data" placeholder="Correo o Dirección TON" class="w-full bg-slate-900 p-3 rounded-xl text-xs">`;
+                title.innerText = m.toUpperCase();
+                fields.innerHTML = `<input type='text' id='f1' placeholder='${m === 'ton' ? 'Billetera TON' : 'Correo ' + m}' class='w-full bg-slate-800 p-3 rounded-lg text-xs'>`;
             }
         }
 
-        function calcVES() {
+        function calcVes() {
             const val = document.getElementById('w-amount').value;
-            const hint = document.getElementById('ves-hint');
-            if(currentM === 'pago_movil' && val > 0) {
-                hint.innerText = `RECIBES: ${(val * TASA_VES).toFixed(2)} Bs.`;
-            } else { hint.innerText = ""; }
+            const hint = document.getElementById('ves-preview');
+            if(activeMethod === 'pago_movil' && val > 0) hint.innerText = "RECIBES: " + (val * TASA_VES).toFixed(2) + " Bs.";
+            else hint.innerText = "";
         }
 
-        function confirmWithdraw() {
+        function closeModal() { document.getElementById('withdraw-modal').classList.add('hidden'); }
+
+        function submitWithdraw() {
             const amt = parseFloat(document.getElementById('w-amount').value);
-            const min = (currentM === 'pago_movil') ? 1.0 : 5.0;
-            if(amt < min) { alert("Mínimo para este método: $" + min); return; }
-            if(amt > balance) { alert("Saldo insuficiente"); return; }
-            alert("Solicitud de $" + amt + " enviada correctamente.");
-            closeWithdraw();
+            const min = activeMethod === 'pago_movil' ? 1 : 5;
+            if(amt < min) return alert("Mínimo $" + min + " para este método.");
+            if(amt > balance) return alert("Saldo insuficiente.");
+            triggerAds();
+            alert("Solicitud enviada. Procesaremos tu pago pronto.");
+            closeModal();
         }
-
-        function closeWithdraw() { document.getElementById('modal-withdraw').style.display = "none"; }
 
         function updateUI() {
-            document.getElementById('display-pts').innerText = pts;
-            document.getElementById('user-balance').innerText = "$" + balance.toFixed(4);
+            document.getElementById('display-pts').innerText = pts + " pts";
+            document.getElementById('user-balance').innerText = balance.toFixed(4);
             document.getElementById('user-energy').innerText = energy;
         }
+
+        function copyRef() {
+            const link = document.getElementById('ref-link');
+            link.select(); document.execCommand('copy');
+            alert("¡Link copiado!");
+        }
+
+        // Inicializar Telegram y Referidos
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        window.onload = () => {
+            const user = tg.initDataUnsafe.user;
+            if (user) document.getElementById('ref-link').value = "https://t.me/RostyLuckyBot/play?start=" + user.id;
+            updateUI();
+        };
     </script>
 </body>
 </html>
