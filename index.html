@@ -3,138 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RostyLucky - Secure Play</title>
+    <title>RostyLucky - Play & Earn</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script type='text/javascript' src='//pl29089431.profitablecpmratenetwork.com/e3/e1/11/e3e11159181e7b873ee93e0a171a4d95.js'></script>
     <style>
-        body { background: #0f172a; color: white; font-family: sans-serif; overflow: hidden; user-select: none; -webkit-tap-highlight-color: transparent; }
-        .tab-content { display: none; height: 70vh; overflow-y: auto; }
+        body { background: #0f172a; color: white; font-family: 'Inter', sans-serif; overflow: hidden; user-select: none; -webkit-tap-highlight-color: transparent; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+        .tab-content { display: none; height: 75vh; overflow-y: auto; padding-bottom: 100px; }
         .active-tab { display: block; }
-        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-        .anim-float { position: absolute; font-weight: bold; color: #facc15; pointer-events: none; animation: floatUp 0.6s ease-out forwards; }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-100px); } }
+        #tap-area { transition: transform 0.05s; touch-action: manipulation; }
+        #tap-area:active { transform: scale(0.92); }
+        .anim-float { position: absolute; font-weight: 800; color: #facc15; pointer-events: none; animation: floatUp 0.6s ease-out forwards; z-index: 50; }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px); } }
     </style>
 </head>
 <body class="p-4">
 
-    <div class="glass p-4 rounded-2xl mb-4 flex justify-between items-center shadow-2xl">
+    <div class="glass p-4 rounded-2xl mb-4 flex justify-between items-center">
         <div>
-            <p class="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Nivel <span id="user-level">1</span></p>
-            <p class="text-xl font-black text-yellow-400" id="user-points text-shadow">0 PTS</p>
+            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Nivel <span id="user-level">1</span></p>
+            <p class="text-xl font-black text-yellow-400" id="display-points">0 PTS</p>
         </div>
         <div class="text-right">
-            <p class="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Balance Hoy: $<span id="daily-limit">0.00</span>/0.02</p>
-            <p class="text-xl font-black text-green-400">$<span id="user-balance">0.00</span></p>
+            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter italic">Balance Hoy: $<span id="daily-earned">0.00</span>/0.02</p>
+            <p class="text-xl font-black text-green-400">$<span id="user-balance">0.0000</span></p>
         </div>
     </div>
 
     <main>
-        <div id="tab-home" class="tab-content active-tab text-center pt-10">
-            <h2 class="text-xl font-bold mb-2">Energía: <span id="user-energy" class="text-cyan-400">0</span></h2>
+        <div id="tab-home" class="tab-content active-tab text-center pt-8">
+            <h2 class="text-lg font-bold mb-4">Energía: <span id="user-energy" class="text-cyan-400">0</span></h2>
             
-            <button onclick="detectBot()" style="opacity: 0.001; position: absolute; top: 0; left: 0;">RECLAMAR PREMIO MAYOR</button>
+            <button onclick="banAction()" style="opacity: 0.0001; position: absolute;">RECLAMAR 100 USDT</button>
 
-            <div id="tap-area" ontouchstart="handleTap(event)" class="relative mx-auto w-56 h-56 bg-gradient-to-tr from-orange-500 to-yellow-500 rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(245,158,11,0.4)] active:scale-90 transition-transform cursor-pointer">
-                <span class="text-7xl font-black">R</span>
+            <div id="tap-area" ontouchstart="handleTap(event)" class="relative mx-auto w-64 h-64 bg-gradient-to-tr from-yellow-600 to-orange-400 rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(202,138,4,0.3)] border-8 border-white/10">
+                <span class="text-8xl font-black italic text-white/20">R</span>
             </div>
-            <p class="mt-6 text-slate-400 text-sm">100 Taps = 1 Energía</p>
+            <p class="mt-8 text-slate-400 text-sm italic">100 Taps = 1 Energía para Suerte</p>
         </div>
 
         <div id="tab-mine" class="tab-content text-center pt-10">
-             <div class="glass p-8 rounded-3xl inline-block w-full">
-                <h2 class="text-2xl font-bold text-cyan-400 mb-4">MINERÍA USDT</h2>
-                <p id="mining-timer" class="text-5xl font-mono mb-6 text-white">03:00:00</p>
-                <button onclick="startMining()" class="w-full bg-cyan-600 py-4 rounded-xl font-bold shadow-lg active:bg-cyan-700">ACTIVAR (ADS)</button>
-             </div>
+            <div class="glass p-8 rounded-3xl">
+                <h2 class="text-2xl font-bold text-cyan-400 mb-2 tracking-widest uppercase text-[15px]">Minería en la Nube</h2>
+                <p id="mining-timer" class="text-5xl font-mono mb-8">03:00:00</p>
+                <button onclick="triggerMining()" class="w-full bg-cyan-600 py-4 rounded-2xl font-black shadow-lg active:scale-95 transition-all">ACTIVAR MINERÍA (VER ANUNCIO)</button>
+            </div>
+        </div>
+
+        <div id="tab-refs" class="tab-content">
+            <div class="glass p-6 rounded-3xl text-center mb-4">
+                <h2 class="text-xl font-bold text-yellow-500 mb-1">Sistema de Referidos</h2>
+                <p class="text-xs text-slate-400">Gana el 10% de por vida por cada amigo.</p>
+            </div>
+            <div class="glass p-4 rounded-2xl mb-4">
+                <input type="text" id="ref-link" readonly class="w-full bg-transparent text-cyan-400 text-xs mb-3 text-center outline-none" value="https://t.me/RostyLuckyBot?start=user">
+                <button onclick="copyRef()" class="w-full bg-white text-black py-2 rounded-xl font-bold text-sm">COPIAR LINK</button>
+            </div>
+            <a href="https://www.profitablecpmratenetwork.com/hjxx0ympqj?key=3816a45c1ebae2a773ddb3dfcdaa95d5" target="_blank" class="block w-full bg-gradient-to-r from-blue-600 to-cyan-500 p-4 rounded-2xl text-center font-bold text-sm">🎁 OBTENER ENERGÍA EXTRA GRATIS</a>
         </div>
 
         <div id="tab-withdraw" class="tab-content">
-            <h2 class="text-2xl font-bold mb-4 text-center">Retirar Ganancias</h2>
-            <div class="space-y-3">
-                <div class="glass p-4 rounded-xl flex justify-between">
-                    <span>Airtm / PayPal</span>
-                    <span class="font-bold text-yellow-400">Min. $5.00</span>
+            <h2 class="text-xl font-bold mb-6 text-center">Métodos de Retiro</h2>
+            <div class="space-y-4">
+                <div class="glass p-4 rounded-2xl flex justify-between items-center border-l-4 border-green-500">
+                    <div><p class="font-bold">Pago Móvil (Venezuela)</p><p class="text-[10px] text-slate-400 italic">Tasa BCV</p></div>
+                    <span class="text-yellow-400 font-black">Min. 680 Bs</span>
                 </div>
-                <div class="glass p-4 rounded-xl flex justify-between">
-                    <span>Pago Móvil (VE)</span>
-                    <span class="font-bold text-yellow-400">Min. 680 Bs</span>
+                <div class="glass p-4 rounded-2xl flex justify-between items-center border-l-4 border-cyan-500">
+                    <div><p class="font-bold">Airtm / PayPal</p><p class="text-[10px] text-slate-400 italic">USDT Directo</p></div>
+                    <span class="text-yellow-400 font-black">Min. $5.00</span>
                 </div>
-                <p class="text-xs text-slate-500 text-center mt-4">Los retiros se procesan en un lapso de 24 a 72 horas hábiles para verificar la legitimidad de los puntos.</p>
             </div>
+            <p class="text-[10px] text-slate-500 mt-10 text-center uppercase tracking-widest font-bold">Procesado por RostyLucky Team</p>
         </div>
     </main>
 
-    <nav class="fixed bottom-6 left-4 right-4 glass flex justify-around p-4 rounded-3xl">
-        <button onclick="showTab('home')" class="text-xl">🏠</button>
-        <button onclick="showTab('mine')" class="text-xl">⛏️</button>
-        <button onclick="showTab('withdraw')" class="text-xl">💰</button>
+    <nav class="fixed bottom-6 left-4 right-4 glass flex justify-around p-4 rounded-3xl shadow-2xl z-50">
+        <button onclick="showTab('home')" class="text-2xl">🏠</button>
+        <button onclick="showTab('mine')" class="text-2xl">⛏️</button>
+        <button onclick="showTab('refs')" class="text-2xl">👥</button>
+        <button onclick="showTab('withdraw')" class="text-2xl">💰</button>
     </nav>
 
     <script>
-        // ESTADO GLOBAL
-        let points = 0;
-        let energy = 0;
-        let balance = 0.00;
-        let dailyEarned = 0.00;
-        let tapsCount = 0;
-
-        // SEGURIDAD ANTI-BOT
-        let lastTapTime = 0;
-        let tapFastCount = 0;
+        let pts = 0; let energy = 0; let balance = 0.00; let daily = 0.00; let taps = 0;
+        let lastTap = 0; let fastTapCount = 0;
 
         function handleTap(e) {
             const now = Date.now();
-            const interval = now - lastTapTime;
+            if (now - lastTap < 100) { // Mas de 10 clics por segundo
+                fastTapCount++;
+                if (fastTapCount > 10) { alert("¡Seguridad Anti-Bot: Calma los dedos!"); return; }
+            } else { fastTapCount = 0; }
+            lastTap = now;
 
-            // Bloqueo si hay más de 10 clics por segundo (100ms entre clics)
-            if (interval < 100) {
-                tapFastCount++;
-                if (tapFastCount > 5) {
-                    alert("¡Velocidad no humana detectada! Calma los dedos.");
-                    return;
-                }
-            } else {
-                tapFastCount = 0; // Reinicia si el ritmo es normal
-            }
-            lastTapTime = now;
-
-            // Efecto Visual
             const touch = e.touches[0];
-            createFloatingText(touch.clientX, touch.clientY);
+            const float = document.createElement("div");
+            float.innerText = "+1"; float.className = "anim-float";
+            float.style.left = touch.clientX + "px"; float.style.top = touch.clientY + "px";
+            document.body.appendChild(float); setTimeout(() => float.remove(), 600);
 
-            // Lógica de Ganancia
-            tapsCount++;
-            if (tapsCount >= 100) {
-                energy++;
-                tapsCount = 0;
-                checkDailyLimit(0.001); // Gana un poquito por cada carga de energía
-            }
+            pts++; taps++;
+            if (taps >= 100) { energy++; taps = 0; updateDaily(0.0001); }
             updateUI();
         }
 
-        function checkDailyLimit(amount) {
-            if (dailyEarned < 0.02) {
-                balance += amount;
-                dailyEarned += amount;
-            } else {
-                console.log("Límite diario alcanzado");
-            }
+        function updateDaily(amt) {
+            if (daily < 0.02) { balance += amt; daily += amt; }
         }
 
-        function createFloatingText(x, y) {
-            const el = document.createElement("div");
-            el.innerText = "+1";
-            el.className = "anim-float";
-            el.style.left = x + "px";
-            el.style.top = y + "px";
-            document.body.appendChild(el);
-            setTimeout(() => el.remove(), 600);
+        function triggerMining() {
+            // Activa el Popunder al intentar minar
+            window.open('https://www.profitablecpmratenetwork.com/hjxx0ympqj?key=3816a45c1ebae2a773ddb3dfcdaa95d5', '_blank');
+            alert("Minería Activada. No cierres la App.");
         }
 
-        function detectBot() {
-            alert("Cuenta suspendida: Intento de uso de script detectado.");
-            window.close();
-        }
+        function banAction() { alert("Bot Detectado. Cuenta Suspendida."); window.close(); }
 
         function showTab(id) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active-tab'));
@@ -142,14 +127,24 @@
         }
 
         function updateUI() {
+            document.getElementById('display-points').innerText = pts + " PTS";
             document.getElementById('user-balance').innerText = balance.toFixed(4);
-            document.getElementById('daily-limit').innerText = dailyEarned.toFixed(2);
+            document.getElementById('daily-earned').innerText = daily.toFixed(2);
             document.getElementById('user-energy').innerText = energy;
+        }
+
+        function copyRef() {
+            const el = document.getElementById('ref-link');
+            el.select(); document.execCommand('copy');
+            alert("¡Link copiado! Gana el 10% por cada referido.");
         }
 
         const tg = window.Telegram.WebApp;
         tg.expand();
         tg.setHeaderColor('#0f172a');
     </script>
+
+    <script src="https://pl29089430.profitablecpmratenetwork.com/dc/73/a2/dc73a2370cdcfb545e7a197bc8bb269a.js"></script>
+
 </body>
 </html>
