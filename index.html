@@ -11,18 +11,47 @@
         .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
         .tab-content { display: none; height: 75vh; overflow-y: auto; padding-bottom: 120px; }
         .active-tab { display: block; }
+        
+        /* Estilos Ruleta Premium */
+        #wheel-container { position: relative; width: 280px; height: 280px; margin: 0 auto; }
+        #wheel-main { 
+            width: 100%; height: 100%; border-radius: 50%; border: 8px solid #1e293b;
+            position: relative; overflow: hidden; transition: transform 7s cubic-bezier(0.15, 0, 0.15, 1);
+            background: conic-gradient(
+                #facc15 0deg 45deg, #eab308 45deg 90deg, 
+                #facc15 90deg 135deg, #eab308 135deg 180deg,
+                #facc15 180deg 225deg, #eab308 225deg 270deg,
+                #facc15 270deg 315deg, #eab308 315deg 360deg
+            );
+            box-shadow: 0 0 50px rgba(234, 179, 8, 0.2), inset 0 0 20px rgba(0,0,0,0.5);
+        }
+        .wheel-marker {
+            position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+            width: 30px; height: 40px; background: #ef4444; clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+            z-index: 10; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5));
+        }
+        .wheel-segment {
+            position: absolute; width: 50%; height: 50%; transform-origin: 100% 100%;
+            display: flex; align-items: center; justify-content: center; font-size: 20px;
+        }
+        #wheel-center {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 60px; height: 60px; background: #0f172a; border-radius: 50%;
+            border: 4px solid #facc15; z-index: 5; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        /* Animaciones */
         #tap-area:active { transform: scale(0.92); }
         .anim-float { position: absolute; font-weight: 800; color: #facc15; pointer-events: none; animation: floatUp 0.6s ease-out forwards; z-index: 50; }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px); } }
-        .spinning { animation: rotate 2s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .mining-active { color: #22d3ee; animation: pulse 1.5s infinite; text-shadow: 0 0 15px rgba(34, 211, 238, 0.6); }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
     </style>
 </head>
 <body class="p-4">
 
-    <div class="glass p-4 rounded-2xl mb-4 flex justify-between items-center shadow-2xl border-b-2 border-yellow-500/20">
+    <div class="glass p-4 rounded-2xl mb-4 flex justify-between items-center border-b-2 border-yellow-500/20 shadow-2xl">
         <div>
             <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Puntos Totales</p>
             <p class="text-xl font-black text-yellow-400" id="display-pts">0</p>
@@ -40,48 +69,60 @@
                     ⚡ Energía: <span id="user-energy">0</span>
                 </span>
             </div>
-            <div id="tap-area" ontouchstart="handleTap(event)" class="relative mx-auto w-60 h-60 bg-gradient-to-tr from-yellow-600 to-orange-400 rounded-full flex items-center justify-center shadow-[0_0_60px_rgba(234,179,8,0.3)] border-[12px] border-white/5 active:scale-90 transition-transform">
+            <div id="tap-area" ontouchstart="handleTap(event)" class="relative mx-auto w-56 h-56 bg-gradient-to-tr from-yellow-600 to-orange-400 rounded-full flex items-center justify-center shadow-[0_0_60px_rgba(234,179,8,0.3)] border-[12px] border-white/5 active:scale-90 transition-transform">
                 <span class="text-8xl font-black italic text-white/20 select-none">R</span>
             </div>
+            <p class="mt-8 text-slate-500 text-[10px] uppercase tracking-[0.2em]">100 Taps = 1 Energía</p>
         </div>
 
-        <div id="tab-wheel" class="tab-content text-center pt-6 px-2">
-            <button id="btn-daily" onclick="claimDaily()" class="mb-6 w-full glass border-yellow-500/50 p-4 rounded-2xl flex items-center justify-between active:scale-95 transition-all">
+        <div id="tab-wheel" class="tab-content text-center pt-4 px-2">
+            <button id="btn-daily" onclick="claimDaily()" class="mb-6 w-full glass border-yellow-500/50 p-3 rounded-2xl flex items-center justify-between active:scale-95 transition-all">
                 <div class="flex items-center gap-3">
                     <span class="text-2xl">🎁</span>
                     <div class="text-left">
-                        <p class="text-xs font-black text-yellow-400 uppercase tracking-tighter">Regalo Diario</p>
-                        <p id="daily-timer" class="text-[10px] text-slate-400 font-bold">¡Disponible ahora!</p>
+                        <p class="text-[10px] font-black text-yellow-400 uppercase">Bono Diario</p>
+                        <p id="daily-timer" class="text-[9px] text-slate-400 font-bold">¡Reclamar ahora!</p>
                     </div>
                 </div>
-                <span class="bg-yellow-500 text-slate-900 text-[10px] px-3 py-1 rounded-lg font-black italic">+5 ENERGÍA</span>
+                <span class="bg-yellow-500 text-slate-900 text-[9px] px-2 py-1 rounded-lg font-black italic">+5 ENERGÍA</span>
             </button>
 
-            <div class="glass p-6 rounded-3xl mb-4">
-                <h2 class="text-xl font-bold mb-4 italic text-yellow-400">Lucky Spin</h2>
-                <div id="wheel-graphic" class="w-44 h-44 mx-auto bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 rounded-full border-8 border-slate-800 flex items-center justify-center shadow-2xl relative">
-                    <div class="w-1 h-10 bg-white absolute top-0 rounded-full shadow-lg"></div>
-                    <span class="text-4xl">🎰</span>
+            <div class="glass p-6 rounded-[40px] mb-4 relative overflow-hidden">
+                <div class="wheel-marker"></div>
+                <div id="wheel-container">
+                    <div id="wheel-main">
+                        <div class="wheel-center" id="wheel-center">🎰</div>
+                        <div class="wheel-segment" style="transform: rotate(0deg) skewY(-45deg);"><span style="transform: skewY(45deg) rotate(22deg) translate(40px, -40px);">💰</span></div>
+                        <div class="wheel-segment" style="transform: rotate(45deg) skewY(-45deg);"><span style="transform: skewY(45deg) rotate(22deg) translate(40px, -40px);">❌</span></div>
+                        <div class="wheel-segment" style="transform: rotate(90deg) skewY(-45deg);"><span style="transform: skewY(45deg) rotate(22deg) translate(40px, -40px);">💎</span></div>
+                        <div class="wheel-segment" style="transform: rotate(135deg) skewY(-45deg);"><span style="transform: skewY(45deg) rotate(22deg) translate(40px, -40px);">❌</span></div>
+                        <div class="wheel-segment" style="transform: rotate(180deg) skewY(-45deg);"><span style="transform: skewY(45deg) rotate(22deg) translate(40px, -40px);">💵</span></div>
+                        <div class="wheel-segment" style="transform: rotate(225deg) skewY(-45deg);"><span style="transform: skewY(45deg) rotate(22deg) translate(40px, -40px);">❌</span></div>
+                        <div class="wheel-segment" style="transform: rotate(270deg) skewY(-45deg);"><span style="transform: skewY(45deg) rotate(22deg) translate(40px, -40px);">🪙</span></div>
+                        <div class="wheel-segment" style="transform: rotate(315deg) skewY(-45deg);"><span style="transform: skewY(45deg) rotate(22deg) translate(40px, -40px);">❌</span></div>
+                    </div>
                 </div>
-                <button onclick="spinWheel()" class="mt-8 w-full bg-yellow-500 text-slate-900 py-4 rounded-2xl font-black text-lg shadow-xl active:scale-95 transition-all uppercase">GIRAR (1 ⚡)</button>
+                
+                <button id="btn-spin" onclick="spinWheel()" class="mt-8 w-full bg-yellow-500 text-slate-900 py-4 rounded-2xl font-black text-lg shadow-[0_4px_0_#a16207] active:shadow-none active:translate-y-1 transition-all">GIRAR AHORA (1 ⚡)</button>
             </div>
         </div>
 
         <div id="tab-mine" class="tab-content text-center pt-6">
             <div class="glass p-8 rounded-3xl border-t-4 border-cyan-500">
                 <div class="mb-4">
-                    <p class="text-[10px] text-slate-400 uppercase font-black tracking-widest">Ganado esta sesión</p>
+                    <p class="text-[10px] text-slate-400 uppercase font-black">Puntos esta sesión</p>
                     <p class="text-2xl font-bold text-cyan-400">+<span id="session-pts">0</span> pts</p>
                 </div>
                 <p id="mining-timer" class="text-5xl font-mono mb-8 tracking-tighter">03:00:00</p>
-                <button id="btn-mine" onclick="startMining()" class="w-full bg-slate-800 py-4 rounded-2xl font-black border border-white/10 shadow-lg">ACTIVAR MINERÍA (ADS)</button>
+                <button id="btn-mine" onclick="startMining()" class="w-full bg-slate-800 py-4 rounded-2xl font-black border border-white/10 shadow-lg active:bg-slate-700">ACTIVAR MINERÍA (ADS)</button>
             </div>
         </div>
 
-        <div id="tab-refs" class="tab-content px-2">
-            <div class="glass p-6 rounded-3xl text-center">
-                <input type="text" id="ref-link" readonly class="w-full bg-transparent text-cyan-400 text-[10px] mb-4 text-center border-b border-white/10 pb-2">
-                <button onclick="copyRef()" class="w-full bg-cyan-600 py-3 rounded-xl font-black text-sm shadow-lg">COPIAR LINK</button>
+        <div id="tab-refs" class="tab-content px-2 pt-6">
+            <div class="glass p-6 rounded-3xl text-center border-b-4 border-cyan-600">
+                <p class="text-[10px] text-slate-400 font-bold uppercase mb-4">Tu Enlace de Invitación</p>
+                <input type="text" id="ref-link" readonly class="w-full bg-slate-900/50 p-3 rounded-xl text-cyan-400 text-[10px] mb-4 text-center border border-white/5 outline-none">
+                <button onclick="copyRef()" class="w-full bg-cyan-600 py-3 rounded-xl font-black text-sm">COPIAR ENLACE</button>
             </div>
         </div>
     </main>
@@ -109,82 +150,86 @@
             updateUI();
         }
 
-        // --- SISTEMA DE REGALO DIARIO ---
-        function claimDaily() {
-            const lastClaim = localStorage.getItem('lastClaim');
-            const now = Date.now();
+        // --- SISTEMA DE RULETA PREMIUM ---
+        function spinWheel() {
+            if (energy < 1) { alert("¡Necesitas 1 ⚡ de Energía!"); return; }
             
-            if (lastClaim && (now - lastClaim) < 86400000) {
-                alert("¡Aún no pasan 24 horas! Vuelve más tarde.");
-                return;
-            }
+            triggerPopunder(); // Abre el anuncio
+            
+            energy--;
+            updateUI();
+            
+            const wheel = document.getElementById('wheel-main');
+            const btn = document.getElementById('btn-spin');
+            
+            btn.disabled = true;
+            btn.innerText = "¡SUERTE!";
+            
+            // Generar un giro de entre 5 y 10 vueltas completas + ángulo aleatorio
+            const randomExtra = Math.floor(Math.random() * 360);
+            const totalRotation = 3600 + randomExtra; // 10 vueltas (3600deg) + extra
+            
+            wheel.style.transform = `rotate(${totalRotation}deg)`;
 
-            triggerPopunder(); // Anuncio antes del regalo
+            setTimeout(() => {
+                // Reset de rotación visual para el siguiente giro sin que se note el salto
+                wheel.style.transition = 'none';
+                const currentDeg = totalRotation % 360;
+                wheel.style.transform = `rotate(${currentDeg}deg)`;
+                setTimeout(() => wheel.style.transition = 'transform 7s cubic-bezier(0.15, 0, 0.15, 1)', 50);
+
+                btn.disabled = false;
+                btn.innerText = "GIRAR AHORA (1 ⚡)";
+
+                // Lógica de premio (8 segmentos de 45deg cada uno)
+                // Determinamos en qué segmento cayó la flecha (arriba, 0deg)
+                // La flecha está en 0, el premio es (360 - currentDeg)
+                const winIndex = Math.floor(((360 - currentDeg) % 360) / 45);
+                const isWinner = (winIndex % 2 === 0); // Los segmentos pares (0, 2, 4, 6) tienen premio
+
+                if (isWinner) {
+                    const winAmt = (Math.random() * 0.0018).toFixed(4);
+                    if (daily < 0.02) {
+                        balance += parseFloat(winAmt);
+                        daily += parseFloat(winAmt);
+                        alert(`🎁 ¡INCREÍBLE! Has ganado $${winAmt} USDT.`);
+                    } else {
+                        alert("Límite de USDT hoy alcanzado. ¡Mañana más!");
+                    }
+                } else {
+                    alert("🎰 ¡Uffs, casi! No te rindas, la próxima será la buena.");
+                }
+                updateUI();
+            }, 7000); // Duración del giro de 7 segundos
+        }
+
+        // --- REGALO DIARIO ---
+        function claimDaily() {
+            const last = localStorage.getItem('lastClaim');
+            const now = Date.now();
+            if (last && (now - last) < 86400000) { alert("Vuelve mañana para tu regalo."); return; }
+            triggerPopunder();
             energy += 5;
             localStorage.setItem('lastClaim', now);
             updateDailyTimer();
             updateUI();
-            alert("🎁 ¡Has recibido +5 de Energía de regalo!");
+            alert("🎁 ¡Recibiste +5 ⚡ de regalo!");
         }
 
         function updateDailyTimer() {
-            const lastClaim = localStorage.getItem('lastClaim');
-            const timerEl = document.getElementById('daily-timer');
-            const btn = document.getElementById('btn-daily');
-
-            if (!lastClaim) return;
-
-            const nextClaim = parseInt(lastClaim) + 86400000;
-            const check = () => {
-                const now = Date.now();
-                const diff = nextClaim - now;
-
-                if (diff <= 0) {
-                    timerEl.innerText = "¡Disponible ahora!";
-                    btn.classList.remove('opacity-50');
-                    return;
-                }
-
-                btn.classList.add('opacity-50');
+            const last = localStorage.getItem('lastClaim');
+            if (!last) return;
+            const next = parseInt(last) + 86400000;
+            const timer = () => {
+                const diff = next - Date.now();
+                if (diff <= 0) { document.getElementById('daily-timer').innerText = "¡Disponible ahora!"; return; }
                 const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
                 const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
                 const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
-                timerEl.innerText = `Disponible en: ${h}:${m}:${s}`;
-                setTimeout(check, 1000);
+                document.getElementById('daily-timer').innerText = `Disponible: ${h}:${m}:${s}`;
+                setTimeout(timer, 1000);
             };
-            check();
-        }
-
-        // --- SISTEMA DE RULETA CORREGIDO ---
-        function spinWheel() {
-            if (energy < 1) { alert("¡Sin energía!"); return; }
-            
-            triggerPopunder();
-            energy--;
-            const wheel = document.getElementById('wheel-graphic');
-            wheel.classList.add('spinning');
-            updateUI();
-
-            setTimeout(() => {
-                wheel.classList.remove('spinning');
-                
-                // Probabilidad: 40% de ganar dinero, 60% de no ganar nada
-                const chance = Math.random();
-                
-                if (chance > 0.6) { // GANADOR
-                    const win = (Math.random() * 0.0015).toFixed(4);
-                    if (daily < 0.02) {
-                        balance += parseFloat(win);
-                        daily += parseFloat(win);
-                        alert(`🎡 ¡Felicidades! Has ganado $${win} USDT.`);
-                    } else {
-                        alert("Has alcanzado el límite de hoy, pero sumaste suerte para mañana.");
-                    }
-                } else { // PERDEDOR
-                    alert("🎡 Casi... ¡No te rindas! Inténtalo de nuevo.");
-                }
-                updateUI();
-            }, 2000);
+            timer();
         }
 
         // --- MINERIA ---
@@ -201,18 +246,8 @@
                 let m = Math.floor((miningSeconds % 3600) / 60).toString().padStart(2, '0');
                 let s = (miningSeconds % 60).toString().padStart(2, '0');
                 document.getElementById('mining-timer').innerText = `${h}:${m}:${s}`;
-
-                if (miningSeconds % 10 === 0) { 
-                    pts += 1; sessionPts += 1; 
-                    document.getElementById('session-pts').innerText = sessionPts;
-                    updateUI(); 
-                }
-
-                if (miningSeconds <= 0) {
-                    clearInterval(timerInterval);
-                    isMining = false;
-                    document.getElementById('mining-timer').classList.remove('mining-active');
-                }
+                if (miningSeconds % 10 === 0) { pts += 1; sessionPts += 1; document.getElementById('session-pts').innerText = sessionPts; updateUI(); }
+                if (miningSeconds <= 0) { clearInterval(timerInterval); isMining = false; }
             }, 1000);
         }
 
@@ -237,7 +272,7 @@
         function copyRef() {
             const el = document.getElementById('ref-link');
             el.select(); document.execCommand('copy');
-            alert("¡Link copiado!");
+            alert("¡Enlace copiado!");
         }
 
         const tg = window.Telegram.WebApp;
