@@ -23,11 +23,13 @@
             100% { opacity: 0; transform: translateY(-150px) translateX(var(--x)) scale(1.5); }
         }
 
-        /* Ruleta con Ejes Fijos */
+        /* Ruleta con Ejes Fijos y Sincronización */
         #wheel-container { position: relative; width: 280px; height: 280px; margin: 0 auto; }
         #wheel-main { 
             width: 100%; height: 100%; border-radius: 50%; border: 6px solid #1e293b;
-            position: relative; overflow: hidden; transition: transform 7.5s cubic-bezier(0.15, 0, 0.15, 1);
+            position: relative; overflow: hidden; 
+            /* Animación de 8 segundos para más suspenso */
+            transition: transform 8s cubic-bezier(0.1, 0, 0, 1);
             background: conic-gradient(
                 #facc15 0deg 45deg, #eab308 45deg 90deg, 
                 #facc15 90deg 135deg, #eab308 135deg 180deg,
@@ -42,8 +44,19 @@
         .wheel-segment span { position: absolute; font-size: 22px; transform: skewY(45deg) rotate(22.5deg) translateY(-85px); }
         .wheel-marker { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); width: 34px; height: 44px; background: #ef4444; clip-path: polygon(0% 0%, 100% 0%, 50% 100%); z-index: 30; }
 
-        /* Contenedor de Anuncio debajo de la moneda */
-        #ad-container { min-height: 80px; width: 100%; margin-top: 20px; display: flex; justify-content: center; }
+        /* Contenedor de Anuncio (Fuerza de posición) */
+        #ad-container { 
+            position: relative;
+            min-height: 80px; width: 100%; margin-top: 20px; 
+            display: flex !important; justify-content: center !important; align-items: center !important;
+            clear: both !important;
+        }
+        /* Forzar al anuncio de Adsterra a obedecer al contenedor */
+        #ad-container div, #ad-container script + div {
+            position: relative !important; top: auto !important; bottom: auto !important; left: auto !important; right: auto !important;
+            margin: 0 auto !important;
+            display: flex !important; justify-content: center !important;
+        }
 
         .lvl-bar { height: 6px; background: #1e293b; border-radius: 10px; overflow: hidden; margin-top: 8px; }
         .lvl-progress { height: 100%; background: linear-gradient(90deg, #22d3ee, #facc15); width: 0%; transition: width 0.5s; }
@@ -103,7 +116,7 @@
                         <div class="wheel-segment" style="transform: rotate(315deg) skewY(-45deg);"><span>❌</span></div>
                     </div>
                 </div>
-                <button id="btn-spin" onclick="spinWheel()" class="mt-8 w-full bg-yellow-500 text-slate-900 py-4 rounded-2xl font-black text-lg shadow-[0_5px_0_#854d0e] active:shadow-none active:translate-y-1 transition-all uppercase">¡PROBAR SUERTE! (1 ⚡)</button>
+                <button id="btn-spin" onclick="spinWheel()" class="mt-8 w-full bg-yellow-500 text-slate-900 py-4 rounded-2xl font-black text-lg shadow-[0_5px_0_#854d0e] active:shadow-none active:translate-y-1 transition-all uppercase italic tracking-widest">¡PROBAR SUERTE! (1 ⚡)</button>
             </div>
         </div>
 
@@ -158,7 +171,7 @@
             setTimeout(() => b.remove(), 800);
         }
 
-        // Ruleta con sincronización fija
+        // --- SISTEMA DE RULETA (FÓRMULA SINCRONIZADA FINAL) ---
         function spinWheel() {
             if (energy < 1) { alert("¡Sin energía!"); return; }
             triggerPopunder();
@@ -166,30 +179,50 @@
             
             const wheel = document.getElementById('wheel-main');
             const btn = document.getElementById('btn-spin');
-            btn.disabled = true; btn.style.opacity = "0.5";
-
-            // Lógica: Elegimos el segmento (0 al 7) antes de girar
-            const targetSegment = Math.floor(Math.random() * 8); 
-            const segmentDeg = 45;
-            // Calculamos el ángulo final para que el segmento quede bajo la flecha (flecha está en 0deg)
-            // IMPORTANTE: Para que el segmento X quede en el tope, la ruleta debe rotar (360 - (X * 45))
-            const finalRotation = 3600 + (360 - (targetSegment * segmentDeg)); 
             
-            wheel.style.transform = `rotate(${finalRotation}deg)`;
+            btn.disabled = true;
+            btn.classList.add('opacity-50');
+            
+            // Decidimos el segmento (0 al 7) antes de girar
+            const targetSegmentIndex = Math.floor(Math.random() * 8); 
+            const segmentAngle = 45; // 360 / 8 segmentos
+            
+            // Calculamos la rotación final perfecta
+            // Queremos que el centro del segmento elegido (X * 45) quede arriba.
+            // Para eso, la ruleta debe rotar: (360 - (X * 45))
+            // Añadimos 10 vueltas (3600 grados) para suspenso.
+            const fullSpins = 3600;
+            const finalDegreesNeeded = (360 - (targetSegmentIndex * segmentAngle)) % 360;
+            const totalRotation = fullSpins + finalDegreesNeeded;
+            
+            wheel.style.transform = `rotate(${totalRotation}deg)`;
 
             setTimeout(() => {
-                // Índices pares (0, 2, 4, 6) son los iconos de premio
-                const winningIndices = [0, 2, 4, 6];
-                if (winningIndices.includes(targetSegment)) {
+                // Índices pares (0, 2, 4, 6) son iconos de premio: 💰, 💎, 💵, 🪙
+                const premioIndices = [0, 2, 4, 6];
+                
+                if (premioIndices.includes(targetSegmentIndex)) {
+                    // Sincronización perfecta: Ganó el premio
                     const winAmt = (Math.random() * 0.0018 + 0.0001).toFixed(5);
                     balance += parseFloat(winAmt);
-                    alert(`💎 ¡SÍ! Has ganado $${winAmt} USDT.`);
+                    alert(`💎 ¡Felicidades! Has ganado $${winAmt} USDT.`);
                 } else {
+                    // Sincronización perfecta: Es una ❌
                     alert("🎰 No hubo suerte esta vez. ¡Sigue intentando!");
                 }
-                btn.disabled = false; btn.style.opacity = "1";
+
+                // Estabilizamos la rotación visual para que el siguiente giro empiece bien
+                wheel.style.transition = 'none';
+                wheel.style.transform = `rotate(${finalDegreesNeeded}deg)`;
+                // Reactivamos la animación para el próximo giro
+                setTimeout(() => {
+                    wheel.style.transition = 'transform 8s cubic-bezier(0.1, 0, 0, 1)';
+                }, 50);
+
+                btn.disabled = false;
+                btn.classList.remove('opacity-50');
                 updateUI();
-            }, 7600);
+            }, 8100); // 8 segundos + 100ms de margen
         }
 
         function updateLevels() {
