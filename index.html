@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RostyLucky Elite</title>
+    <title>RostyLucky Elite Pro</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -16,11 +16,16 @@
         .bubble { position: absolute; pointer-events: none; font-weight: 900; color: #22d3ee; animation: bubbleUp 0.8s ease-out forwards; z-index: 1000; font-size: 24px; text-shadow: 0 0 10px #22d3ee; }
         @keyframes bubbleUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px) translateX(20px); } }
 
-        /* Ruleta Calibrada */
-        #wheel-main { width: 280px; height: 280px; border-radius: 50%; border: 6px solid #1e293b; transition: transform 8s cubic-bezier(0.1, 0, 0, 1); background: conic-gradient(#facc15 0 45deg, #eab308 45deg 90deg, #facc15 90deg 135deg, #eab308 135deg 180deg, #facc15 180deg 225deg, #eab308 225deg 270deg, #facc15 270deg 315deg, #eab308 315deg 360deg); }
-        .wheel-marker { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 30px; height: 40px; background: #ef4444; clip-path: polygon(0 0, 100% 0, 50% 100%); z-index: 50; }
+        /* Ruleta con Iconos y Suspenso (10 seg) */
+        #wheel-main { 
+            width: 280px; height: 280px; border-radius: 50%; border: 8px solid #1e293b; 
+            transition: transform 10s cubic-bezier(0.15, 0, 0.15, 1); 
+            background: conic-gradient(#facc15 0 45deg, #eab308 45deg 90deg, #facc15 90deg 135deg, #eab308 135deg 180deg, #facc15 180deg 225deg, #eab308 225deg 270deg, #facc15 270deg 315deg, #eab308 315deg 360deg);
+            position: relative; overflow: hidden; box-shadow: 0 0 40px rgba(0,0,0,0.6);
+        }
+        .wheel-icon { position: absolute; width: 100%; height: 100%; top: 0; left: 0; display: flex; justify-content: center; padding-top: 25px; font-size: 26px; transform-origin: center; }
+        .wheel-marker { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 30px; height: 40px; background: #ef4444; clip-path: polygon(0 0, 100% 0, 50% 100%); z-index: 100; filter: drop-shadow(0 2px 5px black); }
 
-        /* Anuncios */
         #social-bar-container { width: 100%; display: flex; justify-content: center; margin-top: 15px; min-height: 50px; }
     </style>
 </head>
@@ -37,18 +42,28 @@
             <div id="tap-area" ontouchstart="handleTap(event)" class="relative mx-auto w-56 h-56 bg-gradient-to-tr from-yellow-600 to-orange-400 rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(234,179,8,0.3)] border-[10px] border-white/10 active:scale-95 transition-transform">
                 <span class="text-8xl font-black italic text-white/20 select-none">R</span>
             </div>
-            
             <div id="social-bar-container">
                 <script src="https://pl29089430.profitablecpmratenetwork.com/dc/73/a2/dc73a2370cdcfb545e7a197bc8bb269a.js"></script>
             </div>
-            <p class="text-slate-500 text-[10px] font-bold uppercase tracking-[0.3em] mt-4">Toca para ganar energía</p>
+            <p class="text-slate-500 text-[10px] font-bold uppercase tracking-[0.3em] mt-4">Toca para generar energía</p>
         </div>
 
         <div id="tab-wheel" class="tab-content text-center pt-4">
             <div class="glass p-6 rounded-[40px] relative">
                 <div class="wheel-marker"></div>
-                <center><div id="wheel-main"></div></center>
-                <button id="btn-spin" onclick="spinWheel()" class="mt-8 w-full bg-yellow-500 text-slate-900 py-4 rounded-2xl font-black uppercase italic tracking-widest">¡GIRAR! (1 ⚡)</button>
+                <center>
+                    <div id="wheel-main">
+                        <div class="wheel-icon" style="transform: rotate(22.5deg)">💰</div>
+                        <div class="wheel-icon" style="transform: rotate(67.5deg)">❌</div>
+                        <div class="wheel-icon" style="transform: rotate(112.5deg)">💎</div>
+                        <div class="wheel-icon" style="transform: rotate(157.5deg)">❌</div>
+                        <div class="wheel-icon" style="transform: rotate(202.5deg)">💵</div>
+                        <div class="wheel-icon" style="transform: rotate(247.5deg)">❌</div>
+                        <div class="wheel-icon" style="transform: rotate(292.5deg)">🪙</div>
+                        <div class="wheel-icon" style="transform: rotate(337.5deg)">❌</div>
+                    </div>
+                </center>
+                <button id="btn-spin" onclick="spinWheel()" class="mt-8 w-full bg-yellow-500 text-slate-900 py-4 rounded-2xl font-black uppercase italic tracking-widest shadow-lg active:scale-95">¡PROBAR SUERTE! (1 ⚡)</button>
             </div>
         </div>
 
@@ -66,18 +81,16 @@
                 <button onclick="showSection('withdraw')" class="flex-1 bg-yellow-500 text-slate-900 py-2 rounded-xl font-black text-xs uppercase">Retiros</button>
                 <button onclick="showSection('refs')" class="flex-1 bg-slate-800 py-2 rounded-xl font-black text-xs uppercase">Referidos</button>
             </div>
-
             <div id="section-withdraw" class="space-y-3">
                 <div onclick="openModal('pago_movil')" class="glass p-4 rounded-xl flex justify-between items-center"><span>🇻🇪 Pago Móvil</span><span class="text-[10px] text-cyan-400 font-bold">MIN $1</span></div>
                 <div onclick="openModal('ton')" class="glass p-4 rounded-xl flex justify-between items-center"><span>💎 TON Wallet</span><span class="text-[10px] text-slate-400 font-bold">MIN $5</span></div>
                 <div onclick="openModal('airtm')" class="glass p-4 rounded-xl flex justify-between items-center"><span>☁️ Airtm</span><span class="text-[10px] text-slate-400 font-bold">MIN $5</span></div>
                 <div onclick="openModal('paypal')" class="glass p-4 rounded-xl flex justify-between items-center"><span>🅿️ PayPal</span><span class="text-[10px] text-slate-400 font-bold">MIN $5</span></div>
             </div>
-
             <div id="section-refs" style="display:none;" class="glass p-6 rounded-2xl text-center">
                 <p class="text-xs font-bold mb-4">Invita y gana el 10% de sus retiros</p>
                 <input type="text" id="ref-link" readonly class="w-full bg-black/40 p-3 rounded-lg text-[10px] text-center mb-4 text-yellow-400 border border-yellow-500/20">
-                <button onclick="copyRef()" class="w-full bg-cyan-600 py-3 rounded-xl font-black text-xs uppercase">Copiar Link de Invitado</button>
+                <button onclick="copyRef()" class="w-full bg-cyan-600 py-3 rounded-xl font-black text-xs uppercase">Copiar Link</button>
             </div>
         </div>
     </main>
@@ -105,13 +118,9 @@
     <script>
         let balance = 0.00; let energy = 0; let pts = 0;
         let isMining = false; let miningSeconds = 10800;
-        const TASA_VES = 521.42;
-        let activeMethod = "";
+        const TASA_VES = 521.42; let activeMethod = "";
 
-        // Popunder y Direct Link (Adsterra)
-        function triggerAds() {
-            window.open('https://www.profitablecpmratenetwork.com/hjxx0ympqj?key=3816a45c1ebae2a773ddb3dfcdaa95d5', '_blank');
-        }
+        function triggerAds() { window.open('https://www.profitablecpmratenetwork.com/hjxx0ympqj?key=3816a45c1ebae2a773ddb3dfcdaa95d5', '_blank'); }
 
         function showTab(id) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active-tab'));
@@ -123,7 +132,6 @@
             document.getElementById('section-refs').style.display = id === 'refs' ? 'block' : 'none';
         }
 
-        // Tap Tap +1 Burbujas
         function handleTap(e) {
             pts++; if(pts % 40 === 0) energy++;
             const x = e.touches[0].clientX; const y = e.touches[0].clientY;
@@ -135,7 +143,7 @@
             updateUI();
         }
 
-        // Ruleta Calibrada (Offset 22.5)
+        // Ruleta con Suspenso de 10 segundos
         function spinWheel() {
             if(energy < 1) return alert("¡Sin energía!");
             triggerAds();
@@ -144,40 +152,35 @@
             const target = Math.floor(Math.random() * 8);
             const deg = (3600) + (360 - (target * 45)) + 22.5; 
             wheel.style.transform = `rotate(${deg}deg)`;
+            
             setTimeout(() => {
                 if([0, 2, 4, 6].includes(target)) {
                     const win = 0.0005; balance += win;
-                    alert("¡Ganaste $" + win + " USDT!");
-                } else { alert("❌ Sigue intentando"); }
+                    alert("💎 ¡Felicidades! Has ganado $" + win + " USDT.");
+                } else { alert("❌ No hubo suerte esta vez. ¡Sigue intentando!"); }
                 updateUI();
-            }, 8200);
+            }, 10200); 
         }
 
-        // Minería USDT REAL
         function startMining() {
             if(isMining) return;
-            triggerAds();
-            isMining = true;
+            triggerAds(); isMining = true;
             document.getElementById('btn-mine').innerText = "MINANDO USDT...";
-            const clock = document.getElementById('mining-timer');
             const interval = setInterval(() => {
                 miningSeconds--;
                 let h = Math.floor(miningSeconds/3600), m = Math.floor((miningSeconds%3600)/60), s = miningSeconds%60;
-                clock.innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+                document.getElementById('mining-timer').innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
                 if(miningSeconds % 10 === 0) { balance += 0.0001; updateUI(); }
                 if(miningSeconds <= 0) clearInterval(interval);
             }, 1000);
         }
 
-        // Wallet Logic
         function openModal(m) {
             activeMethod = m;
-            document.getElementById('withdraw-modal').style.flex = "flex";
             document.getElementById('withdraw-modal').classList.remove('hidden');
-            document.getElementById('modal-fields').innerHTML = "";
-            const title = document.getElementById('modal-title');
+            document.getElementById('withdraw-modal').style.display = "flex";
             const fields = document.getElementById('modal-fields');
-
+            const title = document.getElementById('modal-title');
             if(m === 'pago_movil') {
                 title.innerText = "Pago Móvil VZLA";
                 fields.innerHTML = `<input type='text' id='f1' placeholder='Banco' class='w-full bg-slate-800 p-3 rounded-lg text-xs'><input type='text' id='f2' placeholder='Cédula' class='w-full bg-slate-800 p-3 rounded-lg text-xs'><input type='text' id='f3' placeholder='Teléfono' class='w-full bg-slate-800 p-3 rounded-lg text-xs'>`;
@@ -194,16 +197,14 @@
             else hint.innerText = "";
         }
 
-        function closeModal() { document.getElementById('withdraw-modal').classList.add('hidden'); }
+        function closeModal() { document.getElementById('withdraw-modal').classList.add('hidden'); document.getElementById('withdraw-modal').style.display = "none"; }
 
         function submitWithdraw() {
             const amt = parseFloat(document.getElementById('w-amount').value);
             const min = activeMethod === 'pago_movil' ? 1 : 5;
-            if(amt < min) return alert("Mínimo $" + min + " para este método.");
-            if(amt > balance) return alert("Saldo insuficiente.");
-            triggerAds();
-            alert("Solicitud enviada. Procesaremos tu pago pronto.");
-            closeModal();
+            if(amt < min) return alert("Mínimo $" + min);
+            if(amt > balance) return alert("Saldo insuficiente");
+            triggerAds(); alert("Solicitud enviada."); closeModal();
         }
 
         function updateUI() {
@@ -214,11 +215,9 @@
 
         function copyRef() {
             const link = document.getElementById('ref-link');
-            link.select(); document.execCommand('copy');
-            alert("¡Link copiado!");
+            link.select(); document.execCommand('copy'); alert("¡Link copiado!");
         }
 
-        // Inicializar Telegram y Referidos
         const tg = window.Telegram.WebApp;
         tg.expand();
         window.onload = () => {
